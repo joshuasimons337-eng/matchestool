@@ -1,0 +1,24 @@
+{
+  "name": "digitpredictor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Signal-only digit analysis platform with Deriv public market data and TRC20 USDT payment verification.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.1.0",
+    "tronweb": "^6.0.4",
+    "ws": "^8.18.0"
+  }
+}

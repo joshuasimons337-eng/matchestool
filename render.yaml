@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: digitpredictor
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: TRONGRID_API_KEY
+        sync: false
