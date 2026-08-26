@@ -230,24 +230,76 @@ app.get("/api/auth/me",(req,res)=>{
 
 app.get("/api/history",async(req,res)=>{
   const symbol=String(req.query.symbol||"1HZ100V");
-  if(!/^[A-Za-z0-9_]{2,30}$/.test(symbol))return res.status(400).json({error:"Invalid symbol"});
+
+  if(!/^[A-Za-z0-9_]{2,30}$/.test(symbol)){
+    return res.status(400).json({error:"Invalid symbol"});
+  }
+
   const ws=new WebSocket(DERIV_WS_URL);
-  const timer=setTimeout(()=>{try{ws.close()}catch{}},10000);
-  ws.on("open",()=>ws.send(JSON.stringify({ticks_history:symbol,end:"latest",count:500,style:"ticks",subscribe:0,req_id:1})));
+
+  const timer=setTimeout(()=>{
+    try{ws.close()}catch{}
+    if(!res.headersSent){
+      res.status(504).json({error:"Deriv history request timed out."});
+    }
+  },10000);
+
+  ws.on("open",()=>{
+    ws.send(JSON.stringify({
+      ticks_history:symbol,
+      end:"latest",
+      count:500,
+      style:"ticks",
+      req_id:1
+    }));
+  });
+
   ws.on("message",buf=>{
     clearTimeout(timer);
+
     try{
       const d=JSON.parse(buf.toString());
-      if(d.error){res.status(502).json({error:d.error.message||"Deriv request failed"});return ws.close();}
-      if(d.msg_type==="history"){
-        res.json({symbol,prices:d.history?.prices||[],times:d.history?.times||[]});
-        ws.close();
-      }
-    }catch{res.status(502).json({error:"Invalid response from Deriv"});try{ws.close()}catch{}}
-  });
-  ws.on("error",()=>{clearTimeout(timer);if(!res.headersSent)res.status(502).json({error:"Unable to connect to Deriv public market data."});});
-});
 
+      if(d.error){
+        if(!res.headersSent){
+          res.status(502).json({
+            error:d.error.message||"Deriv request failed"
+          });
+        }
+        return ws.close();
+      }
+
+      if(d.msg_type==="history"){
+        if(!res.headersSent){
+          res.json({
+            symbol,
+            prices:d.history?.prices||[],
+            times:d.history?.times||[]
+          });
+        }
+        return ws.close();
+      }
+    }catch{
+      if(!res.headersSent){
+        res.status(502).json({
+          error:"Invalid response from Deriv"
+        });
+      }
+
+      try{ws.close()}catch{}
+    }
+  });
+
+  ws.on("error",()=>{
+    clearTimeout(timer);
+
+    if(!res.headersSent){
+      res.status(502).json({
+        error:"Unable to connect to Deriv public market data."
+      });
+    }
+  });
+});
 app.post("/api/payments/verify",paymentLimiter,requireAuth,requireCsrf,async(req,res)=>{
   const product=productInfo(req.body.product), txHash=normalizeTx(req.body.txHash);
   if(!product)return res.status(400).json({error:"Invalid product."});
