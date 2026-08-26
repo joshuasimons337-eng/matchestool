@@ -11,6 +11,7 @@ const path = require("path");
 
 const PORT = Number(process.env.PORT || 3000);
 const NODE_ENV = process.env.NODE_ENV || "development";
+const OWNER_EMAIL = String(process.env.OWNER_EMAIL || "").trim().toLowerCase();
 const SESSION_SECRET = process.env.SESSION_SECRET || "";
 const TRONGRID_BASE_URL = (process.env.TRONGRID_BASE_URL || "https://api.trongrid.io").replace(/\/$/,"");
 const TRONGRID_API_KEY = process.env.TRONGRID_API_KEY || "";
@@ -224,10 +225,21 @@ app.post("/api/auth/login",authLimiter,(req,res)=>{
 });
 app.post("/api/auth/logout",(req,res)=>{clearSession(req,res);res.json({ok:true});});
 app.get("/api/auth/me",(req,res)=>{
-  const a=getAuth(req); if(!a)return res.status(401).json({error:"Not authenticated"});
-  res.json({user:{email:a.email,role:a.role},entitlements:{matches:!!a.matches,overUnder:!!a.over_under,fullAccess:!!a.full_access},csrf:a.csrf_token});
-});
+  const a=getAuth(req);
+  if(!a)return res.status(401).json({error:"Not authenticated"});
 
+  const isOwner = !!OWNER_EMAIL && a.email === OWNER_EMAIL;
+
+  res.json({
+    user:{email:a.email,role:a.role},
+    entitlements:{
+      matches:isOwner || !!a.matches,
+      overUnder:isOwner || !!a.over_under,
+      fullAccess:isOwner || !!a.full_access
+    },
+    csrf:a.csrf_token
+  });
+});
 app.get("/api/history",async(req,res)=>{
   const symbol=String(req.query.symbol||"1HZ100V");
 
