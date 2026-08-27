@@ -1,340 +1,320 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>digitpredictor — Digit Signals for Deriv</title>
-<meta name="description" content="digitpredictor provides signal analysis from Deriv public market data. Historical results are shown transparently and are not guaranteed.">
-<style>
-:root{--bg:#020409;--panel:#0c0f16;--panel2:#11141c;--text:#f5f7fb;--muted:#91a0b8;--accent:#f04b78;--line:#242a35;--green:#50d890;--danger:#ff6878}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:radial-gradient(circle at 50% -10%,#111a31 0,#03050a 45%,#000 100%);color:var(--text);font:15px/1.55 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-a{color:inherit;text-decoration:none}
-.container{width:min(1120px,92%);margin:auto}
-nav{position:sticky;top:0;z-index:20;background:rgba(0,0,0,.84);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-nav .inner{height:72px;display:flex;align-items:center;justify-content:space-between}
-.brand{font-weight:800;font-size:19px}
-.navlinks{display:flex;gap:26px;color:#c9d0dc}
-.navlinks a:hover{color:#fff}
-.actions{display:flex;gap:8px}
-.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;border-radius:28px;border:1px solid #3a414d;background:#11141a;color:#fff;font-weight:700;cursor:pointer}
-.btn.primary{border:0;background:linear-gradient(90deg,#ff4d4d,#db2f8b)}
-.btn.small{padding:9px 15px;font-size:13px}
-.hero{text-align:center;padding:100px 0 76px}
-.eyebrow{color:#8fb3ff;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:12px}
-h1{font-size:clamp(42px,6vw,72px);line-height:1.03;margin:16px 0}
-.hero p{max-width:760px;margin:0 auto 30px;color:#aeb9ca;font-size:18px}
-.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:52px}
-.stat strong{display:block;font-size:29px}
-.stat span{color:var(--muted)}
-section{padding:72px 0}
-.section-title{text-align:center;font-size:30px;margin:0 0 12px}
-.section-sub{text-align:center;color:var(--muted);max-width:760px;margin:0 auto 36px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.card{background:linear-gradient(180deg,rgba(17,20,28,.95),rgba(7,9,13,.95));border:1px solid var(--line);border-radius:16px;padding:26px}
-.card h3{margin:0 0 8px}
-.card p{margin:0;color:#9eabc0}
-.icon{font-size:25px;margin-bottom:12px}
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-.step{text-align:center}
-.step .num{font-size:30px;font-weight:800;color:#ff76a0}
-.dashboard{background:#070a10;border:1px solid var(--line);border-radius:20px;padding:24px}
-.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
-select,input{background:#05070b;color:#fff;border:1px solid #333b48;border-radius:10px;padding:12px 14px;width:100%}
-select{width:auto}
-.live{display:flex;justify-content:space-between;gap:18px;align-items:center;background:#0c1119;border:1px solid var(--line);padding:16px;border-radius:12px;margin-bottom:18px}
-.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#777;margin-right:7px}
-.dot.on{background:var(--green)}
-.signal{font-size:31px;font-weight:850}
-.muted{color:var(--muted)}
-.accuracy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
-.metric{padding:18px;border:1px solid var(--line);border-radius:12px;background:#0b0e14}
-.metric strong{font-size:25px;display:block}
-.notice{padding:14px 16px;border-radius:10px;background:#10141d;border:1px solid #2a3340;color:#aeb9ca;margin-top:16px}
-.notice.success{border-color:#1f6a4a}
-.notice.error{border-color:#6a2833}
-.pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.price{position:relative}
-.price.pop{border-color:#c36c25}
-.price .amount{font-size:36px;font-weight:850;margin:8px 0 16px}
-.price ul{padding-left:18px;color:#aeb9ca;min-height:120px}
-.payment{max-width:850px;margin:auto}
-.address{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#75e6a9;word-break:break-all}
-.field{margin:12px 0}
-.field label{display:block;font-size:13px;color:#9eabc0;margin-bottom:6px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.authbox{max-width:720px;margin:auto}
-.auth-tabs{display:flex;gap:8px;margin-bottom:15px}
-.auth-tabs .btn{flex:1}
-.accountbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:#0b0e14;margin-bottom:15px}
-.entitlements{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
-.ent{border:1px solid var(--line);border-radius:10px;padding:12px}
-.ent strong{display:block}
-.fine{font-size:12px;color:#7f8ca0}
-details{border:1px solid var(--line);background:#0c0f15;border-radius:12px;margin:10px auto;max-width:850px;padding:17px 20px}
-summary{cursor:pointer;font-weight:700}
-footer{border-top:1px solid var(--line);padding:35px 0;color:#7f8ca0;text-align:center}
-.hidden{display:none!important}
-.text-right{text-align:right}
-@media(max-width:800px){
-  .navlinks{display:none}
-  .stats,.grid3,.steps,.pricing,.accuracy-grid,.entitlements,.two{grid-template-columns:1fr}
-  .hero{padding-top:75px}
-  .actions .btn:not(.primary){display:none}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>matchestool � Match Digit Signals</title>
+
+  <meta
+    name="description"
+    content="matchestool provides real-time match digit signal analysis using public market data. Signals only. No automatic trade execution."
+  >
+
+  <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
 <nav>
-  <div class="inner container">
-    <div class="brand">digitpredictor</div>
-    <div class="navlinks">
+  <div class="container nav-inner">
+
+    <a href="index.html" class="brand">
+      Matches<span>Tool</span>
+    </a>
+
+    <div class="nav-links">
       <a href="#features">Features</a>
-      <a href="#how">How It Works</a>
-      <a href="#dashboard">Signals</a>
-      <a href="#pricing">Pricing</a>
-      <a href="#faq">FAQ</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#access">Access</a>
     </div>
-    <div class="actions">
-      <a class="btn primary small" href="#account">Account</a>
+
+    <div class="nav-actions">
+      <a href="login.html" class="btn small">Login</a>
+      <a href="register.html" class="btn primary small">Get Started</a>
     </div>
+
   </div>
 </nav>
 
-<header class="hero container">
-  <div class="eyebrow">Deriv market-data signal tool</div>
-  <h1>Automated Digit Analysis<br>for Deriv Trading</h1>
-  <p>Real-time digit signals for Matches, Even/Odd and Over/Under strategies using public Deriv tick data. No automatic trade execution.</p>
-  <div class="hero-actions">
-    <a class="btn primary" href="#dashboard">Open Signal Dashboard</a>
-    <a class="btn" href="#pricing">View Access</a>
-  </div>
-  <div class="stats">
-    <div class="stat"><strong id="headlineAccuracy">—</strong><span>Historical backtest</span></div>
-    <div class="stat"><strong>3</strong><span>Signal categories</span></div>
-    <div class="stat"><strong>24/7</strong><span>Market-data monitoring</span></div>
-    <div class="stat"><strong>Public</strong><span>Deriv market data</span></div>
-  </div>
-</header>
 
-<section id="features">
-  <div class="container">
-    <h2 class="section-title">Why Choose digitpredictor</h2>
-    <p class="section-sub">Measured results are shown from the historical sample loaded by the tool. There is no hard-coded “90%” or “99%” guarantee.</p>
-    <div class="grid3">
-      <div class="card"><div class="icon">⌁</div><h3>Automated Scanning</h3><p>Processes incoming tick data and recalculates digit statistics.</p></div>
-      <div class="card"><div class="icon">◎</div><h3>Precision Signals</h3><p>Clear signal direction with the current model's observed backtest rate.</p></div>
-      <div class="card"><div class="icon">◷</div><h3>Real-Time Signals</h3><p>Live tick updates from Deriv's public market-data WebSocket.</p></div>
-      <div class="card"><div class="icon">◉</div><h3>Historical Logic</h3><p>Backtests are computed from returned tick history rather than invented performance claims.</p></div>
-      <div class="card"><div class="icon">▣</div><h3>Signal-Only Access</h3><p>No trade execution, balance access, or Deriv account credentials.</p></div>
-      <div class="card"><div class="icon">⚡</div><h3>Fast Monitoring</h3><p>Built for live tick observation; any trade decision remains manual.</p></div>
+<main>
+
+  <!-- HERO -->
+
+  <header class="hero container">
+
+    <div class="eyebrow">
+      Real-Time Match Digit Signal Analysis
     </div>
-  </div>
-</section>
 
-<section id="how">
-  <div class="container">
-    <h2 class="section-title">How It Works</h2>
-    <p class="section-sub">Three stages with the data source and measured performance visible.</p>
-    <div class="steps">
-      <div class="step"><div class="num">1</div><h3>Scans Digits</h3><p class="muted">Public Deriv tick data is received over WebSocket.</p></div>
-      <div class="step"><div class="num">2</div><h3>Calculates Signals</h3><p class="muted">The signal engine analyzes recent digit outcomes and historical samples.</p></div>
-      <div class="step"><div class="num">3</div><h3>You Decide</h3><p class="muted">Signals are informational. Any trade is entered manually in your own Deriv account.</p></div>
+    <h1>
+      Know When To <span>Enter</span>
+    </h1>
+
+    <p>
+      matchestool monitors live market data and presents match-digit
+      signals in a clear format. The tool provides signals only and
+      does not automatically execute trades.
+    </p>
+
+    <div class="hero-actions">
+
+      <a href="matches.html" class="btn primary">
+        Open Matches Tool
+      </a>
+
+      <a href="#how-it-works" class="btn">
+        How It Works
+      </a>
+
     </div>
-  </div>
-</section>
 
-<section id="dashboard">
-  <div class="container">
-    <h2 class="section-title">Live Signal Dashboard</h2>
-    <p class="section-sub">The browser connects through the public Deriv WebSocket. Historical data is requested through your server and then analyzed in the browser.</p>
-    <div class="dashboard">
-      <div class="toolbar">
-        <select id="symbol">
-          <option value="1HZ100V">Volatility 100 (1s)</option>
-          <option value="1HZ75V">Volatility 75 (1s)</option>
-          <option value="1HZ50V">Volatility 50 (1s)</option>
-          <option value="1HZ25V">Volatility 25 (1s)</option>
-          <option value="1HZ10V">Volatility 10 (1s)</option>
-        </select>
-        <button class="btn primary small" id="start" type="button">Connect &amp; Analyze</button>
-        <span class="muted" id="status"><span class="dot"></span>Not connected</span>
+
+    <div class="stats">
+
+      <div class="stat">
+        <strong>Live</strong>
+        <span>Market Monitoring</span>
       </div>
 
-      <div class="live">
-        <div>
-          <div class="muted">Latest tick</div>
-          <div class="signal" id="latest">—</div>
+      <div class="stat">
+        <strong>Clear</strong>
+        <span>ENTER / WAIT Signals</span>
+      </div>
+
+      <div class="stat">
+        <strong>Manual</strong>
+        <span>No Trade Execution</span>
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <!-- FEATURES -->
+
+  <section id="features">
+
+    <div class="container">
+
+      <h2 class="section-title">
+        Built To Make Signals Easier To Read
+      </h2>
+
+      <p class="section-sub">
+        The interface separates the predicted match digit from the
+        signal timing state to reduce confusion.
+      </p>
+
+
+      <div class="grid">
+
+        <article class="card">
+
+          <div class="icon">?</div>
+
+          <h3>Live Monitoring</h3>
+
+          <p>
+            matchestool processes incoming market data and continuously
+            updates its signal analysis.
+          </p>
+
+        </article>
+
+
+        <article class="card">
+
+          <div class="icon">?</div>
+
+          <h3>Clear Trade States</h3>
+
+          <p>
+            The interface clearly shows whether the tool is analyzing,
+            waiting, or indicating an entry signal.
+          </p>
+
+        </article>
+
+
+        <article class="card">
+
+          <div class="icon">?</div>
+
+          <h3>Match Digit Focus</h3>
+
+          <p>
+            The Matches page focuses specifically on match-digit
+            predictions rather than mixing multiple strategies together.
+          </p>
+
+        </article>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- HOW IT WORKS -->
+
+  <section id="how-it-works">
+
+    <div class="container">
+
+      <h2 class="section-title">
+        How matchestool Works
+      </h2>
+
+      <p class="section-sub">
+        A simple signal flow designed to help distinguish analysis from
+        the actual signal state.
+      </p>
+
+
+      <div class="grid">
+
+        <article class="card">
+
+          <div class="icon">1</div>
+
+          <h3>Analyze</h3>
+
+          <p>
+            The tool monitors incoming market data and analyzes recent
+            digit activity.
+          </p>
+
+        </article>
+
+
+        <article class="card">
+
+          <div class="icon">2</div>
+
+          <h3>Signal Ready</h3>
+
+          <p>
+            When a signal is prepared, the predicted match digit is
+            displayed clearly.
+          </p>
+
+        </article>
+
+
+        <article class="card">
+
+          <div class="icon">3</div>
+
+          <h3>ENTER or WAIT</h3>
+
+          <p>
+            The tool displays a clear state so the entry instruction is
+            not confused with the predicted digit.
+          </p>
+
+        </article>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ACCESS -->
+
+  <section id="access">
+
+    <div class="container">
+
+      <h2 class="section-title">
+        Get Access
+      </h2>
+
+      <p class="section-sub">
+        Choose the signal package that fits your needs.
+      </p>
+
+      <div class="pricing-grid">
+
+        <div class="card price">
+          <h3>Matches</h3>
+          <div class="amount">$100</div>
+          <p>Match digit signals and historical analysis.</p>
+          <button class="btn"
+            data-product="matches"
+            type="button">
+            Get Matches Access
+          </button>
         </div>
-        <div class="text-right">
-          <div class="muted">Last digit</div>
-          <div class="signal" id="digit">—</div>
-        </div>
-      </div>
 
-      <div class="accuracy-grid">
-        <div class="metric"><span class="muted">Matches</span><strong id="matchAcc">—</strong><span class="fine">selected Matches model — unseen test</span></div>
-        <div class="metric"><span class="muted">Even/Odd</span><strong id="evenAcc">—</strong><span class="fine">rolling-majority parity backtest</span></div>
-        <div class="metric"><span class="muted">Over/Under</span><strong id="ouAcc">—</strong><span class="fine">rolling-majority 0–4 / 5–9 backtest</span></div>
-      </div>
-<p class="fine" style="margin-top:14px">
-  Matches methodology: candidate models are selected using 70% of the
-  historical sample and evaluated on the remaining 30% as unseen data.
-  The exact-digit random baseline is 10%. Results are historical sample
-  statistics and do not guarantee future performance.
-</p>
-  <p class="fine">
-    Models are selected using the training portion of the historical sample
-    and evaluated on separate unseen data. Random exact-digit baseline is 10%.
-  </p>
-
-  <div style="overflow-x:auto">
-    <table style="width:100%;border-collapse:collapse;margin-top:12px">
-      <thead>
-        <tr style="text-align:left;border-bottom:1px solid var(--line)">
-          <th style="padding:10px">Model</th>
-          <th style="padding:10px">Training</th>
-          <th style="padding:10px">Unseen Test</th>
-          <th style="padding:10px">vs 10% Baseline</th>
-        </tr>
-      </thead>
-      <tbody id="matchComparisonBody">
-        <tr>
-          <td colspan="4" class="muted" style="padding:12px">
-            Waiting for historical data...
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="notice" id="matchConclusion">
-    Waiting for enough historical data to compare models.
-  </div>
-</div>
-
-      <div class="notice" id="signalBox">Signal: waiting for historical data.</div>
-    </div>
-    <p class="fine">Backtest methodology: after the first 50 ticks, each next digit is predicted using only the preceding 50 digits. The displayed rate is the sample hit rate, not a guarantee of future performance.</p>
-  </div>
-</section>
-
-<section id="account">
-  <div class="container">
-    <h2 class="section-title">Your Account</h2>
-    <p class="section-sub">Create an account or sign in to submit payments and receive verified product entitlements.</p>
-
-    <div class="card authbox" id="authCard">
-      <div class="auth-tabs">
-        <button class="btn primary" id="loginTab" type="button">Sign in</button>
-        <button class="btn" id="registerTab" type="button">Create account</button>
-      </div>
-
-      <form id="authForm" novalidate>
-        <div class="field">
-          <label for="email">Email</label>
-          <input id="email" type="email" required autocomplete="email">
+        <div class="card price pop">
+          <h3>Over/Under + Even/Odd</h3>
+          <div class="amount">$100</div>
+          <p>
+            Over/Under and Even/Odd signals in one package.
+          </p>
+          <button class="btn"
+            data-product="over-under"
+            type="button">
+            Get Over/Under + Even/Odd Access
+          </button>
         </div>
 
-        <div class="field">
-          <label for="password">Password (minimum 10 characters)</label>
-          <input id="password" type="password" minlength="10" required autocomplete="current-password">
+        <div class="card price">
+          <h3>Full Access</h3>
+          <div class="amount">$200</div>
+          <p>
+            Access to Matches, Over/Under and Even/Odd signals.
+          </p>
+          <button class="btn primary"
+            data-product="full"
+            type="button">
+            Get Full Access
+          </button>
         </div>
 
-        <button class="btn primary" type="submit" id="authSubmit">Sign in</button>
-      </form>
+      </div>
 
-      <div class="notice" id="authStatus">You need an account before submitting a payment for verification.</div>
+      <div style="text-align:center; margin-top:24px">
+
+        <a href="register.html" class="btn primary">
+          Create Account
+        </a>
+
+      </div>
+
     </div>
 
-    <div class="card hidden" id="accountPanel">
-      <div class="accountbar">
-        <div><strong id="accountEmail">—</strong><div class="fine">Signed in</div></div>
-        <button class="btn small" id="logout" type="button">Log out</button>
-      </div>
-      <div class="muted">Your verified access</div>
-      <div class="entitlements">
-        <div class="ent"><strong id="entMatches">Locked</strong><span class="fine">Matches</span></div>
-        <div class="ent"><strong id="entOU">Locked</strong><span class="fine">Over/Under</span></div>
-        <div class="ent"><strong id="entFull">Locked</strong><span class="fine">Full Access</span></div>
-      </div>
-      <div class="notice" id="accountStatus">Choose a product below and submit a payment transaction hash.</div>
-    </div>
-  </div>
-</section>
+  </section>
 
-<section id="pricing">
-  <div class="container">
-    <h2 class="section-title">Choose Your Access</h2>
-    <p class="section-sub">One-time access. Payment is shown as USDT (TRC20). The backend verifies the blockchain transfer before activating access.</p>
-    <div class="pricing">
-      <div class="card price">
-        <h3>Matches</h3><div class="amount">$100</div><p>Last Digit Match Predictions</p>
-        <ul><li>Matches signals</li><li>Historical results</li><li>Live tick monitoring</li></ul>
-        <button class="btn" data-product="matches" type="button">Get Matches Access</button>
-      </div>
-      <div class="card price pop">
-        <h3>Over/Under</h3><div class="amount">$100</div><p>Most popular</p>
-        <ul><li>Over/Under signals</li><li>Even/Odd signals</li><li>Historical results</li></ul>
-        <button class="btn" data-product="over-under" type="button">Get Over/Under Access</button>
-      </div>
-      <div class="card price">
-        <h3>Full Access</h3><div class="amount">$200</div><p>Best Value</p>
-        <ul><li>Everything in Matches</li><li>Everything in Over/Under</li><li>All signals in one dashboard</li></ul>
-        <button class="btn primary" data-product="full" type="button">Get Full Access</button>
-      </div>
-    </div>
-  </div>
-</section>
+</main>
 
-<section id="payment">
-  <div class="container">
-    <h2 class="section-title">Complete Payment</h2>
-    <div class="card payment">
-      <h3>Pay with Crypto</h3>
-      <p class="muted">USDT (TRC20)</p>
-      <div class="address">TA3VbsQJKS5AiMG8gGJaPj8kcfDdBikDao</div>
-      <p class="fine">Send only the exact USDT amount for the selected product. The backend verifies the confirmed TRC20 transfer before granting access.</p>
-
-      <div class="field">
-        <label for="selectedProduct">Selected product</label>
-        <input id="selectedProduct" readonly value="None selected">
-      </div>
-
-      <div class="field">
-        <label for="tx">Transaction Hash</label>
-        <input id="tx" placeholder="Paste your tx hash here..." autocomplete="off">
-      </div>
-
-      <button class="btn primary" id="payBtn" type="button">Submit Payment Hash</button>
-      <div class="notice" id="payStatus">Sign in and select a product before submitting a transaction hash.</div>
-    </div>
-  </div>
-</section>
-
-<section id="faq">
-  <div class="container">
-    <h2 class="section-title">Frequently Asked Questions</h2>
-    <details><summary>Is the accuracy guaranteed?</summary><p class="muted">No. Accuracy is based on the historical tick sample and the backtest methodology shown in the dashboard. Historical performance does not guarantee future results, and trading always carries risk.</p></details>
-    <details><summary>Which markets are supported?</summary><p class="muted">The dashboard includes several Deriv volatility indices. The production application can be extended to load currently available symbols dynamically.</p></details>
-    <details><summary>Do I need prior trading experience?</summary><p class="muted">The interface is designed to be beginner-friendly, but users should understand the risks of digit trading before risking money.</p></details>
-    <details><summary>Is my Deriv account connected?</summary><p class="muted">No. Market-data signals use Deriv's public WebSocket. digitpredictor does not execute trades or request Deriv account credentials.</p></details>
-    <details><summary>Is support available after purchase?</summary><p class="muted">Support can be provided according to your published support policy. Paid access is activated only after the backend verifies the payment on-chain.</p></details>
-  </div>
-</section>
 
 <footer>
+
   <div class="container">
-    <strong>digitpredictor</strong>
-    <p>Market-data signals for informational purposes only. No accuracy or profit is guaranteed.</p>
-    <p class="fine">Signal-only product. No automatic trade execution. Keep API secrets on the server.</p>
+
+    <strong>
+      matchestool
+    </strong>
+
+    <p>
+      Signal analysis for informational purposes only.
+      No profit or accuracy is guaranteed.
+    </p>
+
+    <p>
+      Signals only. No automatic trade execution.
+    </p>
+
   </div>
+
 </footer>
 
-<!-- IMPORTANT: all JavaScript is now external. This avoids the CSP error caused by inline scripts. -->
-<script src="/app.js" defer></script>
 </body>
 </html>

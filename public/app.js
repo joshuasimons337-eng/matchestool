@@ -1362,6 +1362,96 @@ async function loadMe() {
 }
 
 
+async function enforcePageAccess() {
+
+  const page =
+    window.location.pathname
+      .split('/')
+      .pop()
+      .toLowerCase();
+
+
+  const requirements = {
+
+    'matches.html':
+      'matches',
+
+    'overunder.html':
+      'overUnder',
+
+    'evenodd.html':
+      'overUnder'
+
+  };
+
+
+  const required =
+    requirements[page];
+
+
+  if (!required) {
+
+    return true;
+
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        '/api/auth/me'
+      );
+
+
+    if (!response.ok) {
+
+      window.location.href =
+        'login.html';
+
+      return false;
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    const allowed =
+      !!data.entitlements?.[required] ||
+      !!data.entitlements?.fullAccess;
+
+
+    if (!allowed) {
+
+      window.location.href =
+        'index.html#access';
+
+      return false;
+
+    }
+
+
+    return true;
+
+  } catch (error) {
+
+    console.error(
+      'Could not verify access:',
+      error
+    );
+
+
+    window.location.href =
+      'login.html';
+
+
+    return false;
+  }
+}
+
+
 async function logout() {
 
   try {
@@ -1394,40 +1484,12 @@ async function logout() {
 
 function selectProduct(product) {
 
-  selectedProduct =
-    product;
+  selectedProduct = product;
 
-
-  if (!$('selectedProduct')) {
-    return;
-  }
-
-
-  if (
-    product === 'full'
-  ) {
-
-    $('selectedProduct').value =
-      'Full Access - $200';
-
-  } else if (
-    product === 'matches'
-  ) {
-
-    $('selectedProduct').value =
-      'Matches - $100';
-
-  } else {
-
-    $('selectedProduct').value =
-      'Over/Under - $100';
-  }
-
-
-  location.hash =
-    'payment';
+  window.location.href =
+    'payment.html?product=' +
+    encodeURIComponent(product);
 }
-
 
 async function submitPayment() {
 
@@ -1575,7 +1637,1467 @@ async function submitPayment() {
    INITIALIZE
    ========================================================= */
 
-function initialize() {
+
+
+/* =========================================================
+   MATCHES TOOL - SINGLE MARKET ENGINE
+   ========================================================= */
+
+const MATCHES_MARKETS = {
+  'Volatility 10 (1s)': '1HZ10V',
+  'Volatility 25 (1s)': '1HZ25V',
+  'Volatility 50 (1s)': '1HZ50V',
+  'Volatility 75 (1s)': '1HZ75V',
+  'Volatility 100 (1s)': '1HZ100V'
+};
+
+
+let selectedMatchesMarket = 'Volatility 10 (1s)';
+
+let matchesSocket = null;
+
+let matchesDigits = [];
+
+let matchesCountdown = 10;
+
+let matchesCountdownTimer = null;
+
+
+function getMatchesDigit(history) {
+
+  if (
+    !history ||
+    history.length < 20
+  ) {
+    return null;
+  }
+
+
+  const windowSize =
+    Math.min(
+      50,
+      history.length
+    );
+
+
+  return predictMode(
+    history,
+    windowSize
+  );
+}
+
+
+function updateMatchesDisplay() {
+
+  const predictionEl =
+    $('matchPrediction');
+
+  const tradeSignalEl =
+    $('matchTradeSignal');
+
+  const statusEl =
+    $('matchSignalStatus');
+
+
+  if (!predictionEl) {
+    return;
+  }
+
+
+  /*
+   * Keep the prediction hidden while
+   * the 10-second countdown is running.
+   */
+
+
+
+  if (
+    matchesDigits.length < 20
+  ) {
+
+    if (tradeSignalEl) {
+
+      tradeSignalEl.textContent =
+        'Collecting market data';
+
+    }
+
+
+    if (statusEl) {
+
+      statusEl.textContent =
+        'Loading';
+
+    }
+
+
+    return;
+  }
+
+
+  if (tradeSignalEl) {
+
+    tradeSignalEl.textContent =
+      'Waiting for next signal';
+
+  }
+
+
+  if (statusEl) {
+
+    statusEl.textContent =
+      'Counting down';
+
+  }
+}
+
+
+function updateMatchesCountdown() {
+
+  const timer =
+    $('matchSignalTimer');
+
+
+  if (!timer) {
+    return;
+  }
+
+
+  if (
+    matchesCountdown <= 0
+  ) {
+
+    timer.textContent =
+      'ENTER NOW';
+
+    return;
+  }
+
+
+  timer.innerHTML =
+    `${matchesCountdown} <span>SECONDS</span>`;
+}
+
+function generateMatchesSignal() {
+
+  const predictionEl =
+    $('matchPrediction');
+
+  const tradeSignalEl =
+    $('matchTradeSignal');
+
+  const statusEl =
+    $('matchSignalStatus');
+
+
+  if (
+    matchesDigits.length < 20
+  ) {
+
+    if (predictionEl) {
+
+      predictionEl.textContent =
+        '--';
+
+    }
+
+
+    if (tradeSignalEl) {
+
+      tradeSignalEl.textContent =
+        'Collecting market data...';
+
+    }
+
+
+    if (statusEl) {
+
+      statusEl.textContent =
+        'Please wait';
+
+    }
+
+
+    return;
+  }
+
+
+  const prediction =
+    getMatchesDigit(
+      matchesDigits
+    );
+
+
+  if (predictionEl) {
+
+    predictionEl.textContent =
+      prediction === null
+        ? '--'
+        : prediction;
+
+  }
+
+
+  if (tradeSignalEl) {
+
+    tradeSignalEl.textContent =
+      prediction === null
+        ? 'WAIT'
+        : `ENTER - MATCH ${prediction}`;
+
+  }
+
+
+  if (statusEl) {
+
+    statusEl.textContent =
+      prediction === null
+        ? 'Waiting'
+        : 'Signal Ready';
+
+  }
+
+
+  matchesCountdown = 10;
+
+
+  updateMatchesCountdown();
+}
+
+
+function startMatchesCountdown() {
+
+  if (
+    matchesCountdownTimer
+  ) {
+
+    clearInterval(
+      matchesCountdownTimer
+    );
+
+  }
+
+
+  function beginCountdown() {
+
+    const predictionEl =
+      $('matchPrediction');
+
+    const tradeSignalEl =
+      $('matchTradeSignal');
+
+    const statusEl =
+      $('matchSignalStatus');
+
+if (tradeSignalEl) {
+
+      tradeSignalEl.textContent =
+        'Waiting for next signal';
+
+    }
+
+
+    if (statusEl) {
+
+      statusEl.textContent =
+        'Counting down';
+
+    }
+
+
+    matchesCountdown = 10;
+
+    updateMatchesCountdown();
+
+
+    matchesCountdownTimer =
+      setInterval(
+        () => {
+
+          matchesCountdown--;
+
+
+          if (
+            matchesCountdown <= 0
+          ) {
+
+            clearInterval(
+              matchesCountdownTimer
+            );
+
+
+            matchesCountdownTimer =
+              null;
+
+
+            generateMatchesSignal();
+
+
+            matchesCountdown = 0;
+
+            updateMatchesCountdown();
+
+
+            setTimeout(
+              beginCountdown,
+              3000
+            );
+
+
+            return;
+          }
+
+
+          updateMatchesCountdown();
+
+        },
+        1000
+      );
+  }
+
+
+  beginCountdown();
+}
+
+function connectMatchesMarket() {
+
+  const statusEl =
+    $('matchSignalStatus');
+
+
+  const marketSymbol =
+    MATCHES_MARKETS[
+      selectedMatchesMarket
+    ];
+
+
+  if (!marketSymbol) {
+
+    console.error(
+      'Unknown Matches market:',
+      selectedMatchesMarket
+    );
+
+    return;
+
+  }
+
+
+  if (
+    matchesSocket
+  ) {
+
+    try {
+
+      matchesSocket.close();
+
+    } catch (error) {
+
+      console.error(
+        'Socket close error:',
+        error
+      );
+
+    }
+
+  }
+
+
+  matchesDigits = [];
+
+
+  if (statusEl) {
+
+    statusEl.textContent =
+      'Connecting...';
+
+  }
+
+
+  matchesSocket =
+    new WebSocket(
+      DERIV_WS_URL
+    );
+
+
+  matchesSocket.onopen =
+    () => {
+
+      if (statusEl) {
+
+        statusEl.textContent =
+          'Loading market data...';
+
+      }
+
+
+      matchesSocket.send(
+        JSON.stringify({
+          ticks_history:
+            marketSymbol,
+
+          adjust_start_time: 1,
+
+          count: 100,
+
+          end: 'latest',
+
+          style: 'ticks',
+
+          req_id: 200
+        })
+      );
+
+
+      matchesSocket.send(
+        JSON.stringify({
+          ticks:
+            marketSymbol,
+
+          subscribe: 1,
+
+          req_id: 201
+        })
+      );
+
+    };
+
+
+  matchesSocket.onmessage =
+    event => {
+
+      let data;
+
+
+      try {
+
+        data =
+          JSON.parse(
+            event.data
+          );
+
+      } catch (error) {
+
+        return;
+
+      }
+
+
+      if (
+        data.error
+      ) {
+
+        console.error(
+          'MatchesTool API error:',
+          data.error
+        );
+
+
+        if (statusEl) {
+
+          statusEl.textContent =
+            'Market unavailable';
+
+        }
+
+
+        return;
+
+      }
+
+
+      if (
+        data.msg_type === 'history' &&
+        data.history &&
+        Array.isArray(
+          data.history.prices
+        )
+      ) {
+
+        matchesDigits =
+          data.history.prices
+            .map(
+              price =>
+                lastDigit(
+                  price
+                )
+            )
+            .filter(
+              digit =>
+                digit !== null
+            )
+            .slice(
+              -100
+            );
+
+
+        updateMatchesDisplay();
+
+
+        return;
+
+      }
+
+
+      if (
+        data.msg_type === 'tick' &&
+        data.tick
+      ) {
+
+        const digit =
+          lastDigit(
+            data.tick.quote
+          );
+
+
+        if (
+          digit === null
+        ) {
+
+          return;
+
+        }
+
+
+        matchesDigits.push(
+          digit
+        );
+
+
+        if (
+          matchesDigits.length > 100
+        ) {
+
+          matchesDigits.shift();
+
+        }
+
+
+        updateMatchesDisplay();
+
+      }
+
+    };
+
+
+  matchesSocket.onerror =
+    error => {
+
+      console.error(
+        'MatchesTool socket error:',
+        error
+      );
+
+
+      if (statusEl) {
+
+        statusEl.textContent =
+          'Connection error';
+
+      }
+
+    };
+
+
+  matchesSocket.onclose =
+    () => {
+
+      if (statusEl) {
+
+        statusEl.textContent =
+          'Disconnected';
+
+      }
+
+    };
+
+}
+
+
+function startMatchesTool() {
+
+  const dashboardExists =
+    $('matchPrediction');
+
+
+  if (
+    !dashboardExists
+  ) {
+
+    console.log(
+      'Matches dashboard not found. Engine not started.'
+    );
+
+    return;
+
+  }
+
+
+  document
+    .querySelectorAll(
+      '.volatility-option'
+    )
+    .forEach(
+      button => {
+
+        if (
+          button.dataset.volatility ===
+          selectedMatchesMarket
+        ) {
+
+          button.classList.add(
+            'active'
+          );
+
+        }
+
+
+        button.addEventListener(
+          'click',
+          () => {
+
+            selectedMatchesMarket =
+              button.dataset.volatility;
+
+
+            document
+              .querySelectorAll(
+                '.volatility-option'
+              )
+              .forEach(
+                option =>
+                  option.classList.remove(
+                    'active'
+                  )
+              );
+
+
+            button.classList.add(
+              'active'
+            );
+
+
+            const predictionEl =
+              $('matchPrediction');
+
+
+            const tradeSignalEl =
+              $('matchTradeSignal');
+
+
+            if (predictionEl) {
+
+              predictionEl.textContent =
+                '--';
+
+            }
+
+
+            if (tradeSignalEl) {
+
+              tradeSignalEl.textContent =
+                'Waiting for signal';
+
+            }
+
+
+            connectMatchesMarket();
+
+          }
+        );
+
+      }
+    );
+
+
+  const generateButton =
+    $('generateMatchSignal');
+
+
+  if (
+    generateButton
+  ) {
+
+    generateButton.addEventListener(
+      'click',
+      generateMatchesSignal
+    );
+
+  }
+
+
+  connectMatchesMarket();
+
+
+  startMatchesCountdown();
+
+}
+
+
+/* =========================================================
+   EVEN / ODD TOOL
+   ========================================================= */
+
+let evenOddSocket = null;
+let evenOddDigits = [];
+let selectedEvenOddMarket = 'Volatility 10 (1s)';
+
+
+function getEvenOddSignal(digits) {
+
+  if (digits.length < 20) {
+    return null;
+  }
+
+
+  const recent =
+    digits.slice(-50);
+
+
+  const evenCount =
+    recent.filter(
+      digit => digit % 2 === 0
+    ).length;
+
+
+  const oddCount =
+    recent.length -
+    evenCount;
+
+
+  return evenCount >= oddCount
+    ? 'EVEN'
+    : 'ODD';
+}
+
+
+function updateEvenOddDisplay() {
+
+  const predictionEl =
+    $('evenOddPrediction');
+
+  const tradeSignalEl =
+    $('evenOddTradeSignal');
+
+  const statusEl =
+    $('evenOddSignalStatus');
+
+
+  if (!predictionEl) {
+    return;
+  }
+
+
+  if (evenOddDigits.length < 20) {
+
+    predictionEl.textContent =
+      '--';
+
+
+    if (tradeSignalEl) {
+      tradeSignalEl.textContent =
+        'Collecting market data';
+    }
+
+
+    if (statusEl) {
+      statusEl.textContent =
+        'Loading';
+    }
+
+
+    return;
+  }
+
+
+  const prediction =
+    getEvenOddSignal(
+      evenOddDigits
+    );
+
+
+  predictionEl.textContent =
+    prediction || '--';
+
+
+  if (tradeSignalEl) {
+    tradeSignalEl.textContent =
+      prediction
+        ? `ENTER - ${prediction}`
+        : 'WAIT';
+  }
+
+
+  if (statusEl) {
+    statusEl.textContent =
+      'Live signal';
+  }
+}
+
+
+function connectEvenOddMarket() {
+
+  const statusEl =
+    $('evenOddSignalStatus');
+
+
+  const marketSymbol =
+    MATCHES_MARKETS[
+      selectedEvenOddMarket
+    ];
+
+
+  if (!marketSymbol) {
+    console.error(
+      'Unknown Even/Odd market:',
+      selectedEvenOddMarket
+    );
+    return;
+  }
+
+
+  if (evenOddSocket) {
+
+    try {
+      evenOddSocket.close();
+    } catch (error) {
+      console.error(
+        'Even/Odd socket close error:',
+        error
+      );
+    }
+
+  }
+
+
+  evenOddDigits = [];
+
+
+  evenOddSocket =
+    new WebSocket(
+      DERIV_WS_URL
+    );
+
+
+  evenOddSocket.onopen =
+    () => {
+
+      if (statusEl) {
+        statusEl.textContent =
+          'Loading market data...';
+      }
+
+
+      evenOddSocket.send(
+        JSON.stringify({
+          ticks_history:
+            marketSymbol,
+
+          adjust_start_time: 1,
+          count: 100,
+          end: 'latest',
+          style: 'ticks',
+          req_id: 300
+        })
+      );
+
+
+      evenOddSocket.send(
+        JSON.stringify({
+          ticks:
+            marketSymbol,
+
+          subscribe: 1,
+          req_id: 301
+        })
+      );
+
+    };
+
+
+  evenOddSocket.onmessage =
+    event => {
+
+      let data;
+
+
+      try {
+        data =
+          JSON.parse(
+            event.data
+          );
+      } catch (error) {
+        return;
+      }
+
+
+      if (data.error) {
+
+        if (statusEl) {
+          statusEl.textContent =
+            'Market unavailable';
+        }
+
+        return;
+      }
+
+
+      if (
+        data.msg_type === 'history' &&
+        data.history &&
+        Array.isArray(
+          data.history.prices
+        )
+      ) {
+
+        evenOddDigits =
+          data.history.prices
+            .map(
+              price =>
+                lastDigit(price)
+            )
+            .filter(
+              digit =>
+                digit !== null
+            )
+            .slice(-100);
+
+
+        updateEvenOddDisplay();
+
+        return;
+      }
+
+
+      if (
+        data.msg_type === 'tick' &&
+        data.tick
+      ) {
+
+        const digit =
+          lastDigit(
+            data.tick.quote
+          );
+
+
+        if (digit === null) {
+          return;
+        }
+
+
+        evenOddDigits.push(
+          digit
+        );
+
+
+        if (
+          evenOddDigits.length > 100
+        ) {
+          evenOddDigits.shift();
+        }
+
+
+        updateEvenOddDisplay();
+
+      }
+
+    };
+
+
+  evenOddSocket.onerror =
+    error => {
+
+      console.error(
+        'Even/Odd socket error:',
+        error
+      );
+
+
+      if (statusEl) {
+        statusEl.textContent =
+          'Connection error';
+      }
+
+    };
+
+
+  evenOddSocket.onclose =
+    () => {
+
+      if (statusEl) {
+        statusEl.textContent =
+          'Disconnected';
+      }
+
+    };
+
+}
+
+
+function startEvenOddTool() {
+
+  if (!$('evenOddPrediction')) {
+    return;
+  }
+
+
+  document
+    .querySelectorAll(
+      '.evenodd-volatility-option'
+    )
+    .forEach(
+      button => {
+
+        if (
+          button.dataset.volatility ===
+          selectedEvenOddMarket
+        ) {
+          button.classList.add(
+            'active'
+          );
+        }
+
+
+        button.addEventListener(
+          'click',
+          () => {
+
+            selectedEvenOddMarket =
+              button.dataset.volatility;
+
+
+            document
+              .querySelectorAll(
+                '.evenodd-volatility-option'
+              )
+              .forEach(
+                option =>
+                  option.classList.remove(
+                    'active'
+                  )
+              );
+
+
+            button.classList.add(
+              'active'
+            );
+
+
+            if ($('evenOddPrediction')) {
+              $('evenOddPrediction').textContent =
+                '--';
+            }
+
+
+            if ($('evenOddTradeSignal')) {
+              $('evenOddTradeSignal').textContent =
+                'Waiting for signal';
+            }
+
+
+            connectEvenOddMarket();
+
+          }
+        );
+
+      }
+    );
+
+
+  connectEvenOddMarket();
+
+}
+
+
+/* =========================================================
+   OVER / UNDER TOOL
+   ========================================================= */
+
+let overUnderSocket = null;
+let overUnderDigits = [];
+let selectedOverUnderMarket =
+  'Volatility 10 (1s)';
+
+
+function getOverUnderSignal(digits) {
+
+  if (digits.length < 20) {
+    return null;
+  }
+
+
+  const recent =
+    digits.slice(-50);
+
+
+  const overCount =
+    recent.filter(
+      digit => digit >= 5
+    ).length;
+
+
+  const underCount =
+    recent.length -
+    overCount;
+
+
+  return overCount >= underCount
+    ? 'OVER 4'
+    : 'UNDER 5';
+}
+
+
+function updateOverUnderDisplay() {
+
+  const predictionEl =
+    $('overUnderPrediction');
+
+  const tradeSignalEl =
+    $('overUnderTradeSignal');
+
+  const statusEl =
+    $('overUnderSignalStatus');
+
+
+  if (!predictionEl) {
+    return;
+  }
+
+
+  if (
+    overUnderDigits.length < 20
+  ) {
+
+    predictionEl.textContent =
+      '--';
+
+
+    if (tradeSignalEl) {
+      tradeSignalEl.textContent =
+        'Collecting market data';
+    }
+
+
+    if (statusEl) {
+      statusEl.textContent =
+        'Loading';
+    }
+
+
+    return;
+  }
+
+
+  const prediction =
+    getOverUnderSignal(
+      overUnderDigits
+    );
+
+
+  predictionEl.textContent =
+    prediction || '--';
+
+
+  if (tradeSignalEl) {
+    tradeSignalEl.textContent =
+      prediction
+        ? `ENTER - ${prediction}`
+        : 'WAIT';
+  }
+
+
+  if (statusEl) {
+    statusEl.textContent =
+      'Live signal';
+  }
+}
+
+
+function connectOverUnderMarket() {
+
+  const statusEl =
+    $('overUnderSignalStatus');
+
+
+  const marketSymbol =
+    MATCHES_MARKETS[
+      selectedOverUnderMarket
+    ];
+
+
+  if (!marketSymbol) {
+    console.error(
+      'Unknown Over/Under market:',
+      selectedOverUnderMarket
+    );
+    return;
+  }
+
+
+  if (overUnderSocket) {
+
+    try {
+      overUnderSocket.close();
+    } catch (error) {
+      console.error(
+        'Over/Under socket close error:',
+        error
+      );
+    }
+
+  }
+
+
+  overUnderDigits = [];
+
+
+  overUnderSocket =
+    new WebSocket(
+      DERIV_WS_URL
+    );
+
+
+  overUnderSocket.onopen =
+    () => {
+
+      if (statusEl) {
+        statusEl.textContent =
+          'Loading market data...';
+      }
+
+
+      overUnderSocket.send(
+        JSON.stringify({
+          ticks_history:
+            marketSymbol,
+
+          adjust_start_time: 1,
+          count: 100,
+          end: 'latest',
+          style: 'ticks',
+          req_id: 400
+        })
+      );
+
+
+      overUnderSocket.send(
+        JSON.stringify({
+          ticks:
+            marketSymbol,
+
+          subscribe: 1,
+          req_id: 401
+        })
+      );
+
+    };
+
+
+  overUnderSocket.onmessage =
+    event => {
+
+      let data;
+
+
+      try {
+        data =
+          JSON.parse(
+            event.data
+          );
+      } catch (error) {
+        return;
+      }
+
+
+      if (data.error) {
+
+        if (statusEl) {
+          statusEl.textContent =
+            'Market unavailable';
+        }
+
+        return;
+      }
+
+
+      if (
+        data.msg_type === 'history' &&
+        data.history &&
+        Array.isArray(
+          data.history.prices
+        )
+      ) {
+
+        overUnderDigits =
+          data.history.prices
+            .map(
+              price =>
+                lastDigit(price)
+            )
+            .filter(
+              digit =>
+                digit !== null
+            )
+            .slice(-100);
+
+
+        updateOverUnderDisplay();
+
+        return;
+      }
+
+
+      if (
+        data.msg_type === 'tick' &&
+        data.tick
+      ) {
+
+        const digit =
+          lastDigit(
+            data.tick.quote
+          );
+
+
+        if (digit === null) {
+          return;
+        }
+
+
+        overUnderDigits.push(
+          digit
+        );
+
+
+        if (
+          overUnderDigits.length > 100
+        ) {
+          overUnderDigits.shift();
+        }
+
+
+        updateOverUnderDisplay();
+
+      }
+
+    };
+
+
+  overUnderSocket.onerror =
+    error => {
+
+      console.error(
+        'Over/Under socket error:',
+        error
+      );
+
+
+      if (statusEl) {
+        statusEl.textContent =
+          'Connection error';
+      }
+
+    };
+
+
+  overUnderSocket.onclose =
+    () => {
+
+      if (statusEl) {
+        statusEl.textContent =
+          'Disconnected';
+      }
+
+    };
+
+}
+
+
+function startOverUnderTool() {
+
+  if (!$('overUnderPrediction')) {
+    return;
+  }
+
+
+  document
+    .querySelectorAll(
+      '.overunder-volatility-option'
+    )
+    .forEach(
+      button => {
+
+        if (
+          button.dataset.volatility ===
+          selectedOverUnderMarket
+        ) {
+          button.classList.add(
+            'active'
+          );
+        }
+
+
+        button.addEventListener(
+          'click',
+          () => {
+
+            selectedOverUnderMarket =
+              button.dataset.volatility;
+
+
+            document
+              .querySelectorAll(
+                '.overunder-volatility-option'
+              )
+              .forEach(
+                option =>
+                  option.classList.remove(
+                    'active'
+                  )
+              );
+
+
+            button.classList.add(
+              'active'
+            );
+
+
+            if ($('overUnderPrediction')) {
+              $('overUnderPrediction').textContent =
+                '--';
+            }
+
+
+            if ($('overUnderTradeSignal')) {
+              $('overUnderTradeSignal').textContent =
+                'Waiting for signal';
+            }
+
+
+            connectOverUnderMarket();
+
+          }
+        );
+
+      }
+    );
+
+
+  connectOverUnderMarket();
+
+}
+
+
+async function initialize() {
+
+  const accessAllowed =
+    await enforcePageAccess();
+
+
+  if (!accessAllowed) {
+
+    return;
+
+  }
 
   if ($('start')) {
 
@@ -1665,6 +3187,12 @@ function initialize() {
 
 
   loadMe();
+
+  startMatchesTool();
+
+  startEvenOddTool();
+
+  startOverUnderTool();
 }
 
 
@@ -1673,3 +3201,24 @@ if (document.readyState === 'loading') {
 } else {
   initialize();
 }
+
+
+
+
+
+/* Password Show/Hide toggle */
+document.querySelectorAll(".toggle-password").forEach(button => {
+  button.addEventListener("click", () => {
+    const targetId = button.getAttribute("data-target");
+    const passwordInput = document.getElementById(targetId);
+
+    if (!passwordInput) {
+      return;
+    }
+
+    const isPassword = passwordInput.type === "password";
+
+    passwordInput.type = isPassword ? "text" : "password";
+    button.textContent = isPassword ? "Hide" : "Show";
+  });
+});

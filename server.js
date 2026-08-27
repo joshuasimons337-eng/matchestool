@@ -48,7 +48,7 @@ app.use(helmet({
 app.use(express.json({limit:"20kb"}));
 app.use(express.urlencoded({extended:false,limit:"20kb"}));
 
-const db = new Database(path.join(__dirname,"data","digitpredictor.sqlite"));
+const db = new Database(path.join(__dirname,"data","matchestool.sqlite"));
 db.pragma("journal_mode = WAL");
 db.exec(`
 CREATE TABLE IF NOT EXISTS users(
@@ -203,7 +203,7 @@ async function verifyUsdtPayment(txHash, expectedUsdt){
   return {status:"verified",reason:"Confirmed USDT transfer matched."};
 }
 
-app.get("/api/health",(req,res)=>res.json({ok:true,service:"digitpredictor",time:now()}));
+app.get("/api/health",(req,res)=>res.json({ok:true,service:"matchestool",time:now()}));
 
 app.post("/api/auth/register",authLimiter,async(req,res)=>{
   const email=String(req.body.email||"").trim().toLowerCase(), password=req.body.password;
@@ -346,6 +346,6 @@ app.get("/api/payments/mine",requireAuth,(req,res)=>{
 app.use(express.static(path.join(__dirname,"public"),{extensions:["html"]}));
 app.get("/{*splat}",(req,res)=>res.sendFile(path.join(__dirname,"public","index.html")));
 
-const server=app.listen(PORT,"0.0.0.0",()=>console.log(`digitpredictor listening on port ${PORT}`));
+const server=app.listen(PORT,"0.0.0.0",()=>console.log(`matchestool listening on port ${PORT}`));
 process.on("SIGTERM",()=>{server.close(()=>db.close());});
 process.on("SIGINT",()=>{server.close(()=>db.close());});

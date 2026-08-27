@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Over/Under Prediction | matchestool</title>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<nav>
+  <div class="inner container">
+
+    <a href="/" class="brand">Matches<span>Tool</span></a>
+
+    <div class="nav-links">
+      <a href="matches.html">Matches</a>
+      <a href="evenodd.html">Even/Odd</a>
+      <a href="overunder.html">Over/Under</a>
+      <a href="how-to-use.html">How to Use</a>
+      <a href="important.html">Important</a>
+    </div>
+
+    <div class="nav-actions">
+      <a href="login.html" class="btn small">Login</a>
+      <a href="register.html" class="btn primary small">Get Started</a>
+    </div>
+
+  </div>
+</nav>
+
+
+<main class="prediction-page">
+
+  <div class="container prediction-container">
+
+    <div class="page-heading">
+
+      <span class="page-badge">
+        OVER / UNDER
+      </span>
+
+      <h1>
+        Predict Over or Under
+      </h1>
+
+      <p>
+        Select a Volatility Index and receive a live
+        Over/Under market signal based on recent tick data.
+      </p>
+
+    </div>
+
+
+    <!-- VOLATILITY SELECTOR -->
+
+    <section class="prediction-card volatility-card">
+
+      <div class="card-heading">
+
+        <div>
+
+          <h2>
+            Select Volatility Index
+          </h2>
+
+          <p>
+            Choose the market you want to analyze.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="volatility-grid">
+
+        <button
+          class="volatility-option overunder-volatility-option active"
+          data-volatility="Volatility 10 (1s)"
+        >
+          Volatility 10 (1s)
+        </button>
+
+
+        <button
+          class="volatility-option overunder-volatility-option"
+          data-volatility="Volatility 25 (1s)"
+        >
+          Volatility 25 (1s)
+        </button>
+
+
+        <button
+          class="volatility-option overunder-volatility-option"
+          data-volatility="Volatility 50 (1s)"
+        >
+          Volatility 50 (1s)
+        </button>
+
+
+        <button
+          class="volatility-option overunder-volatility-option"
+          data-volatility="Volatility 75 (1s)"
+        >
+          Volatility 75 (1s)
+        </button>
+
+
+        <button
+          class="volatility-option overunder-volatility-option"
+          data-volatility="Volatility 100 (1s)"
+        >
+          Volatility 100 (1s)
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- PREDICTION -->
+
+    <section class="prediction-card main-prediction-card">
+
+      <div class="card-heading">
+
+        <div>
+
+          <h2>
+            Prediction
+          </h2>
+
+          <p>
+            Live Over/Under signal from recent market data.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="prediction-display">
+
+        <div class="prediction-label">
+          PREDICTED OUTCOME
+        </div>
+
+
+        <div
+          id="overUnderPrediction"
+          class="prediction-value"
+        >
+          --
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- TRADE SIGNAL -->
+
+    <section class="prediction-card signal-card">
+
+      <div class="signal-row">
+
+        <div class="signal-info">
+
+          <span class="signal-label">
+            TRADE SIGNAL
+          </span>
+
+
+          <strong id="overUnderTradeSignal">
+            Waiting for signal
+          </strong>
+
+        </div>
+
+
+        <div class="signal-status">
+
+          <span class="status-dot"></span>
+
+
+          <span id="overUnderSignalStatus">
+            Connecting...
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- HOW TO USE -->
+
+    <section class="info-card">
+
+      <h2>
+        How to Use
+      </h2>
+
+
+      <ol>
+
+        <li>
+          Select your preferred Volatility Index.
+        </li>
+
+        <li>
+          Wait for the market data to load.
+        </li>
+
+        <li>
+          Review the predicted Over or Under outcome.
+        </li>
+
+        <li>
+          Use the signal for your own market analysis.
+        </li>
+
+      </ol>
+
+    </section>
+
+
+    <!-- IMPORTANT -->
+
+    <section class="info-card important-card">
+
+      <h2>
+        Important
+      </h2>
+
+
+      <p>
+        matchestool provides market analysis and signals only.
+        It does not execute trades or guarantee profits.
+        Trading involves risk, and signals should not be treated
+        as financial advice.
+      </p>
+
+    </section>
+
+  </div>
+
+</main>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>

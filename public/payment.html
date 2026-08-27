@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Payment | matchestool</title>
+
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  >
+</head>
+
+
+<body>
+
+  <!-- NAVIGATION -->
+
+  <nav>
+
+    <div class="nav-inner container">
+
+      <a
+        href="/"
+        class="brand"
+      >
+        Matches<span>Tool</span>
+      </a>
+
+
+      <div class="nav-links">
+
+        <a href="matches.html">
+          Matches
+        </a>
+
+        <a href="evenodd.html">
+          Even/Odd
+        </a>
+
+        <a href="overunder.html">
+          Over/Under + Even/Odd
+        </a>
+
+        <a href="how-to-use.html">
+          How to Use
+        </a>
+
+        <a href="important.html">
+          Important
+        </a>
+
+      </div>
+
+
+      <div class="nav-actions">
+
+        <a
+          href="login.html"
+          class="btn small"
+        >
+          Login
+        </a>
+
+
+        <a
+          href="register.html"
+          class="btn primary small"
+        >
+          Get Started
+        </a>
+
+      </div>
+
+    </div>
+
+  </nav>
+
+
+
+  <main class="payment-page">
+
+    <section>
+
+      <div class="container">
+
+        <!-- PAGE HEADING -->
+
+        <div class="page-heading">
+
+          <span class="page-badge">
+            SECURE PAYMENT
+          </span>
+
+
+          <h1>
+            Complete Your Payment
+          </h1>
+
+
+          <p>
+            Select your matchestool access plan,
+            send the required USDT payment, and submit
+            your transaction hash for verification.
+          </p>
+
+        </div>
+
+
+
+        <!-- PAYMENT CARD -->
+
+        <div
+          class="card payment-card"
+          id="payment"
+        >
+
+          <div class="card-heading">
+
+            <div>
+
+              <h2>
+                Pay with USDT
+              </h2>
+
+
+              <p>
+                TRC20 Network
+              </p>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- PRODUCT -->
+
+          <div class="payment-field">
+
+            <label
+              for="selectedProduct"
+            >
+              Selected Product
+            </label>
+
+
+            <input
+              id="selectedProduct"
+              type="text"
+              readonly
+              value="Loading selection..."
+            >
+
+          </div>
+
+
+
+          <!-- PAYMENT ADDRESS -->
+
+          <div class="payment-field">
+
+            <label>
+              Payment Address
+            </label>
+
+
+            <div class="payment-address">
+
+              TA3VbsQJKS5AiMG8gGJaPj8kcfDdBikDao
+
+            </div>
+
+
+            <p class="muted">
+
+              Send only USDT using the TRC20 network
+              to this address.
+
+            </p>
+
+          </div>
+
+
+
+          <!-- TRANSACTION HASH -->
+
+          <div class="payment-field">
+
+            <label
+              for="tx"
+            >
+              Transaction Hash
+            </label>
+
+
+            <input
+              id="tx"
+              type="text"
+              placeholder="Paste your 64-character transaction hash"
+              autocomplete="off"
+            >
+
+          </div>
+
+
+
+          <!-- VERIFY BUTTON -->
+
+          <button
+            class="btn primary payment-submit"
+            id="payBtn"
+            type="button"
+          >
+
+            Submit Payment Hash
+
+          </button>
+
+
+
+          <!-- STATUS -->
+
+          <div
+            class="notice"
+            id="payStatus"
+          >
+
+            Sign in, select a product,
+            complete the payment, then submit
+            your transaction hash for verification.
+
+          </div>
+
+        </div>
+
+
+
+        <!-- PAYMENT INSTRUCTIONS -->
+
+        <div class="payment-instructions">
+
+          <div class="card">
+
+            <div class="icon">
+              1
+            </div>
+
+
+            <h3>
+              Select Access
+            </h3>
+
+
+            <p>
+              Choose Matches, Over/Under + Even/Odd,
+              or Full Access from the pricing page.
+            </p>
+
+          </div>
+
+
+
+          <div class="card">
+
+            <div class="icon">
+              2
+            </div>
+
+
+            <h3>
+              Send USDT
+            </h3>
+
+
+            <p>
+              Send the exact amount shown for your
+              selected product using the TRC20 network.
+            </p>
+
+          </div>
+
+
+
+          <div class="card">
+
+            <div class="icon">
+              3
+            </div>
+
+
+            <h3>
+              Submit Hash
+            </h3>
+
+
+            <p>
+              Paste the transaction hash.
+              The backend verifies the payment
+              before activating access.
+            </p>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- SECURITY NOTICE -->
+
+        <div class="card payment-security">
+
+          <h3>
+            Payment Verification
+          </h3>
+
+
+          <p>
+            Access is not activated simply by entering
+            a transaction hash. The payment verification
+            server checks the blockchain transaction for
+            the required amount and receiving address
+            before activating the purchased entitlement.
+          </p>
+
+        </div>
+
+
+
+        <!-- BACK -->
+
+        <div class="payment-back">
+
+          <a
+            href="/"
+            class="btn"
+          >
+            ? Back to Home
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+
+  <script src="app.js"></script>
+
+
+  <script>
+
+    /*
+     * Read the selected product from the URL.
+     */
+
+    (function () {
+
+      const params =
+        new URLSearchParams(
+          window.location.search
+        );
+
+
+      const product =
+        params.get('product');
+
+
+      const selectedInput =
+        document.getElementById(
+          'selectedProduct'
+        );
+
+
+      const status =
+        document.getElementById(
+          'payStatus'
+        );
+
+
+      const products = {
+
+        matches: {
+          label:
+            'Matches - $100'
+        },
+
+
+        'over-under': {
+          label:
+            'Over/Under + Even/Odd - $100'
+        },
+
+
+        full: {
+          label:
+            'Full Access - $200'
+        }
+
+      };
+
+
+      if (
+        product &&
+        products[product]
+      ) {
+
+        /*
+         * Set the global variable used by app.js.
+         */
+
+        selectedProduct =
+          product;
+
+
+        if (selectedInput) {
+
+          selectedInput.value =
+            products[product].label;
+
+        }
+
+
+        if (status) {
+
+          status.textContent =
+            'Complete the payment, then submit your transaction hash for verification.';
+
+        }
+
+      } else {
+
+        if (selectedInput) {
+
+          selectedInput.value =
+            'No product selected';
+
+        }
+
+
+        if (status) {
+
+          status.className =
+            'notice error';
+
+
+          status.textContent =
+            'Please select a product before submitting a payment.';
+
+        }
+
+      }
+
+    })();
+
+  </script>
+
+
+</body>
+
+</html>

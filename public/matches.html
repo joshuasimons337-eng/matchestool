@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Match Digit Prediction | matchestool</title>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<nav>
+  <div class="inner container">
+
+    <a href="/" class="brand">
+      matchestool
+    </a>
+
+    <div class="nav-links">
+      <a href="matches.html">Matches</a>
+      <a href="evenodd.html">Even/Odd</a>
+      <a href="overunder.html">Over/Under</a>
+      <a href="how-to-use.html">How to Use</a>
+      <a href="important.html">Important</a>
+    </div>
+
+    <div class="nav-actions">
+      <a href="login.html" class="btn small">Login</a>
+      <a href="register.html" class="btn primary small">Get Started</a>
+    </div>
+
+  </div>
+</nav>
+
+
+<main class="prediction-page">
+
+  <div class="container prediction-container">
+
+    <div class="page-heading">
+      <span class="page-badge">MATCH DIGIT</span>
+
+      <h1>Predict Match Digit</h1>
+
+      <p>
+        Select a Volatility Index and receive a signal for the next potential
+        matching digit opportunity.
+      </p>
+    </div>
+
+
+    <!-- VOLATILITY SELECTOR -->
+
+    <section class="prediction-card volatility-card">
+
+      <div class="card-heading">
+        <div>
+          <h2>Select Volatility Index</h2>
+          <p>Choose the market you want to analyze.</p>
+        </div>
+      </div>
+
+      <div class="volatility-grid">
+
+        <button class="volatility-option active" data-volatility="Volatility 10 (1s)">
+          Volatility 10 (1s)
+        </button>
+
+        <button class="volatility-option" data-volatility="Volatility 25 (1s)">
+          Volatility 25 (1s)
+        </button>
+
+        <button class="volatility-option" data-volatility="Volatility 50 (1s)">
+          Volatility 50 (1s)
+        </button>
+
+        <button class="volatility-option" data-volatility="Volatility 75 (1s)">
+          Volatility 75 (1s)
+        </button>
+
+        <button class="volatility-option" data-volatility="Volatility 100 (1s)">
+          Volatility 100 (1s)
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- PREDICTION -->
+
+    <section class="prediction-card main-prediction-card">
+
+      <div class="card-heading">
+        <div>
+          <h2>Prediction</h2>
+          <p>Generate a Match Digit signal.</p>
+        </div>
+      </div>
+
+
+      <div class="prediction-display">
+
+        <div class="prediction-label">
+          PREDICTED MATCH DIGIT
+        </div>
+
+        <div id="matchPrediction" class="prediction-value">
+          --
+        </div>
+
+      </div>
+
+
+      <button id="generateMatchSignal" class="btn primary prediction-button">
+        Generate Signal
+      </button>
+
+    </section>
+
+
+    <!-- TRADE SIGNAL -->
+
+    <section class="prediction-card signal-card">
+
+      <div class="signal-row">
+
+        <div class="signal-info">
+          <span class="signal-label">TRADE SIGNAL</span>
+
+          <strong id="matchTradeSignal">
+            Waiting for signal
+          </strong>
+        </div>
+
+
+        <div class="signal-status">
+
+          <span class="status-dot"></span>
+
+          <span id="matchSignalStatus">
+            Ready
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- NEXT SIGNAL TIME -->
+
+    <section class="prediction-card timer-card">
+
+      <div class="timer-content">
+
+        <span class="timer-label">
+          TIME OF NEXT SIGNAL
+        </span>
+
+        <div id="matchSignalTimer" class="timer-value">
+          10
+          <span>SECONDS</span>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- HOW TO USE -->
+
+    <section class="info-card">
+
+      <h2>How to Use</h2>
+
+      <ol>
+        <li>Select your preferred Volatility Index.</li>
+        <li>Click <strong>Generate Signal</strong>.</li>
+        <li>Wait for the prediction and trade signal.</li>
+        <li>Use the information for analysis only.</li>
+      </ol>
+
+    </section>
+
+
+    <!-- IMPORTANT -->
+
+    <section class="info-card important-card">
+
+      <h2>Important</h2>
+
+      <p>
+        matchestool provides market analysis and signals only.
+        It does not execute trades or guarantee profits.
+        Trading involves risk, and signals should not be treated
+        as financial advice.
+      </p>
+
+    </section>
+
+
+  </div>
+
+</main>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>

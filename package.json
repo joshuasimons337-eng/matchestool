@@ -1,5 +1,5 @@
 {
-  "name": "digitpredictor",
+  "name": "matchestool",
   "version": "1.0.0",
   "private": true,
   "description": "Signal-only digit analysis platform with Deriv public market data and TRC20 USDT payment verification.",

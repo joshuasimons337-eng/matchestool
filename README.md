@@ -1,4 +1,4 @@
-# digitpredictor
+# matchestool
 
 Full-stack digit signal application.
 
@@ -10,14 +10,14 @@ Use GitHub as the source-code repository, then connect the repository to a Node.
 
 The production architecture is:
 
-GitHub repository -> Node.js host -> your domain -> digitpredictor
+GitHub repository -> Node.js host -> your domain -> matchestool
 
 The frontend is served by the same Express server, so you do not need a separate static-site deployment.
 
 ## Repository structure
 
 ```text
-digitpredictor/
+matchestool/
 ├── public/
 │   └── index.html
 ├── data/
@@ -80,7 +80,7 @@ The dashboard displays an observed historical rolling-window backtest from the r
 
 ## GitHub upload
 
-1. Create a new GitHub repository named `digitpredictor`.
+1. Create a new GitHub repository named `matchestool`.
 2. Upload the **contents of this folder** (not the ZIP file itself).
 3. Commit the files to the repository.
 4. Connect the repository to your Node.js hosting provider.

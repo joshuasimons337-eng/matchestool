@@ -1,4 +1,4 @@
-# digitpredictor — final deployable package
+# matchestool — final deployable package
 
 This folder is the merged application: the public landing page/frontend is served by the Node/Express backend in `server.js`.
 

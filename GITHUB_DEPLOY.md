@@ -1,10 +1,10 @@
-# Uploading digitpredictor to GitHub
+# Uploading matchestool to GitHub
 
 ## A. Create the repository
 
 On GitHub, create a new empty repository called:
 
-`digitpredictor`
+`matchestool`
 
 Do not upload the ZIP as a single file. Upload the files/folders inside this package.
 
