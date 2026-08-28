@@ -1491,6 +1491,147 @@ function selectProduct(product) {
     encodeURIComponent(product);
 }
 
+
+function loadSelectedProductFromUrl() {
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const product =
+    params.get('product');
+
+  const validProducts =
+    [
+      'matches',
+      'over-under',
+      'full'
+    ];
+
+  if (
+    validProducts.includes(product)
+  ) {
+
+    selectedProduct =
+      product;
+
+  }
+}
+
+function loadSelectedPaymentProduct() {
+
+  const page =
+    window.location.pathname
+      .split('/')
+      .pop()
+      .toLowerCase();
+
+
+  if (page !== 'payment.html') {
+
+    return;
+
+  }
+
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+
+  const product =
+    params.get('product');
+
+
+  const products = {
+
+    matches: {
+      label:
+        'Matches - $100'
+    },
+
+
+    'over-under': {
+      label:
+        'Over/Under + Even/Odd - $100'
+    },
+
+
+    full: {
+      label:
+        'Full Access - $200'
+    }
+
+  };
+
+
+  if (
+    !product ||
+    !products[product]
+  ) {
+
+    selectedProduct =
+      '';
+
+
+    if ($('selectedProduct')) {
+
+      $('selectedProduct')
+        .value =
+        'No product selected';
+
+    }
+
+
+    if ($('payStatus')) {
+
+      $('payStatus')
+        .className =
+        'notice error';
+
+
+      $('payStatus')
+        .textContent =
+        'Please select a product before submitting a payment.';
+
+    }
+
+
+    return;
+
+  }
+
+
+  selectedProduct =
+    product;
+
+
+  if ($('selectedProduct')) {
+
+    $('selectedProduct')
+      .value =
+      products[product].label;
+
+  }
+
+
+  if ($('payStatus')) {
+
+    $('payStatus')
+      .className =
+      'notice';
+
+
+    $('payStatus')
+      .textContent =
+      'Selected product: ' +
+      products[product].label;
+
+  }
+
+}
 async function submitPayment() {
 
   if (!csrf) {
@@ -3087,7 +3228,244 @@ function startOverUnderTool() {
 }
 
 
+
+async function submitLoginPage(event) {
+
+  event.preventDefault();
+
+
+  const email =
+    $('loginEmail').value.trim();
+
+
+  const password =
+    $('loginPassword').value;
+
+
+  const submitButton =
+    event.currentTarget.querySelector(
+      'button[type="submit"]'
+    );
+
+
+  if (submitButton) {
+
+    submitButton.disabled =
+      true;
+
+    submitButton.textContent =
+      'Signing in...';
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        '/api/auth/login',
+        {
+          method: 'POST',
+
+          headers: {
+            'content-type':
+              'application/json'
+          },
+
+          body:
+            JSON.stringify({
+              email,
+              password
+            })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!response.ok) {
+
+      alert(
+        data.error ||
+        'Login failed.'
+      );
+
+      return;
+    }
+
+
+    window.location.href =
+      'index.html';
+
+  } catch (error) {
+
+    console.error(
+      'Login error:',
+      error
+    );
+
+
+    alert(
+      'Unable to connect to the server.'
+    );
+
+  } finally {
+
+    if (submitButton) {
+
+      submitButton.disabled =
+        false;
+
+      submitButton.textContent =
+        'Login';
+    }
+  }
+}
+
+
+async function submitRegisterPage(event) {
+
+  event.preventDefault();
+
+
+  const email =
+    $('registerEmail').value.trim();
+
+
+  const password =
+    $('registerPassword').value;
+
+
+  const confirmPassword =
+    $('confirmPassword').value;
+
+
+  if (password.length < 10) {
+
+    alert(
+      'Password must be at least 10 characters.'
+    );
+
+    return;
+  }
+
+
+  if (
+    password !==
+    confirmPassword
+  ) {
+
+    alert(
+      'Passwords do not match.'
+    );
+
+    return;
+  }
+
+
+  const submitButton =
+    event.currentTarget.querySelector(
+      'button[type="submit"]'
+    );
+
+
+  if (submitButton) {
+
+    submitButton.disabled =
+      true;
+
+    submitButton.textContent =
+      'Creating account...';
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        '/api/auth/register',
+        {
+          method: 'POST',
+
+          headers: {
+            'content-type':
+              'application/json'
+          },
+
+          body:
+            JSON.stringify({
+              email,
+              password
+            })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!response.ok) {
+
+      alert(
+        data.error ||
+        'Account creation failed.'
+      );
+
+      return;
+    }
+
+
+    window.location.href =
+      'index.html';
+
+  } catch (error) {
+
+    console.error(
+      'Registration error:',
+      error
+    );
+
+
+    alert(
+      'Unable to connect to the server.'
+    );
+
+  } finally {
+
+    if (submitButton) {
+
+      submitButton.disabled =
+        false;
+
+      submitButton.textContent =
+        'Create Account';
+    }
+  }
+}
+
 async function initialize() {
+  if ($('loginForm')) {
+
+    $('loginForm')
+      .addEventListener(
+        'submit',
+        submitLoginPage
+      );
+  }
+
+
+  if ($('registerForm')) {
+
+    $('registerForm')
+      .addEventListener(
+        'submit',
+        submitRegisterPage
+      );
+  }
+
+
 
   const accessAllowed =
     await enforcePageAccess();
@@ -3171,6 +3549,9 @@ async function initialize() {
     );
 
 
+  loadSelectedPaymentProduct();
+
+
   if ($('payBtn')) {
 
     $('payBtn')
@@ -3186,13 +3567,34 @@ async function initialize() {
   );
 
 
-  loadMe();
+    loadMe();
 
-  startMatchesTool();
+  const page =
+    window.location.pathname
+      .split('/')
+      .pop()
+      .toLowerCase();
 
-  startEvenOddTool();
 
-  startOverUnderTool();
+  if (page === 'matches.html') {
+
+    startMatchesTool();
+
+  }
+
+
+  if (page === 'evenodd.html') {
+
+    startEvenOddTool();
+
+  }
+
+
+  if (page === 'overunder.html') {
+
+    startOverUnderTool();
+
+  }
 }
 
 

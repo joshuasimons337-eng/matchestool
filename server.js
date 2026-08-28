@@ -313,29 +313,124 @@ app.get("/api/history",async(req,res)=>{
   });
 });
 app.post("/api/payments/verify",paymentLimiter,requireAuth,requireCsrf,async(req,res)=>{
-  const product=productInfo(req.body.product), txHash=normalizeTx(req.body.txHash);
-  if(!product)return res.status(400).json({error:"Invalid product."});
-  if(!validTx(txHash))return res.status(400).json({error:"Invalid transaction hash."});
-  const existing=db.prepare("SELECT * FROM payments WHERE tx_hash=?").get(txHash);
-  if(existing && existing.user_id!==req.auth.user_id)return res.status(409).json({error:"This transaction has already been submitted."});
-  if(!existing){
-    db.prepare("INSERT INTO payments(user_id,product,amount_usdt,tx_hash,created_at) VALUES(?,?,?,?,?)")
-      .run(req.auth.user_id,product.key,product.amount,txHash,now());
+  const product=productInfo(req.body.product),
+        txHash=normalizeTx(req.body.txHash);
+
+  if(!product){
+    return res.status(400).json({
+      error:"Invalid product."
+    });
   }
-  const result=await verifyUsdtPayment(txHash,product.amount);
-  db.prepare("UPDATE payments SET status=?,reason=?,verified_at=? WHERE tx_hash=?")
-    .run(result.status,result.reason,result.status==="verified"?now():null,txHash);
+
+  if(!validTx(txHash)){
+    return res.status(400).json({
+      error:"Invalid transaction hash."
+    });
+  }
+
+  const existing=db
+    .prepare("SELECT * FROM payments WHERE tx_hash=?")
+    .get(txHash);
+
+  if(existing && existing.user_id!==req.auth.user_id){
+    return res.status(409).json({
+      error:"This transaction has already been submitted."
+    });
+  }
+
+  if(
+    existing &&
+    existing.user_id===req.auth.user_id &&
+    existing.status==="verified"
+  ){
+    return res.json({
+      ok:true,
+      status:"verified",
+      message:"This payment was already verified and access is active."
+    });
+  }
+
+  if(!existing){
+    db.prepare(`
+      INSERT INTO payments(
+        user_id,
+        product,
+        amount_usdt,
+        tx_hash,
+        created_at
+      )
+      VALUES(?,?,?,?,?)
+    `).run(
+      req.auth.user_id,
+      product.key,
+      product.amount,
+      txHash,
+      now()
+    );
+  }
+
+  const result=await verifyUsdtPayment(
+    txHash,
+    product.amount
+  );
+
+  db.prepare(`
+    UPDATE payments
+    SET status=?,
+        reason=?,
+        verified_at=?
+    WHERE tx_hash=?
+  `).run(
+    result.status,
+    result.reason,
+    result.status==="verified"
+      ? now()
+      : null,
+    txHash
+  );
 
   if(result.status==="verified"){
+
     const col=product.key;
+
     if(col==="full_access"){
-      db.prepare("UPDATE entitlements SET full_access=1,matches=1,over_under=1 WHERE user_id=?").run(req.auth.user_id);
+
+      db.prepare(`
+        UPDATE entitlements
+        SET full_access=1,
+            matches=1,
+            over_under=1
+        WHERE user_id=?
+      `).run(req.auth.user_id);
+
     }else{
-      db.prepare(`UPDATE entitlements SET ${col}=1 WHERE user_id=?`).run(req.auth.user_id);
+
+      db.prepare(`
+        UPDATE entitlements
+        SET ${col}=1
+        WHERE user_id=?
+      `).run(req.auth.user_id);
+
     }
-    return res.json({ok:true,status:"verified",message:"Payment verified and access activated."});
+
+    return res.json({
+      ok:true,
+      status:"verified",
+      message:"Payment verified and access activated."
+    });
   }
-  res.status(result.status==="pending"?202:400).json({ok:false,status:result.status,message:result.reason});
+
+  return res
+    .status(
+      result.status==="pending"
+        ? 202
+        : 400
+    )
+    .json({
+      ok:false,
+      status:result.status,
+      message:result.reason
+    });
 });
 
 app.get("/api/payments/mine",requireAuth,(req,res)=>{
