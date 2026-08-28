@@ -3,212 +3,276 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Match Digit Prediction | matchestool</title>
-
+  <title>Matches Predictions | MatchesTool</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="dashboard.css">
 </head>
-
-<body>
-
-<nav>
-  <div class="inner container">
-
-    <a href="/" class="brand">
-      matchestool
-    </a>
-
-    <div class="nav-links">
-      <a href="matches.html">Matches</a>
-      <a href="evenodd.html">Even/Odd</a>
-      <a href="overunder.html">Over/Under</a>
-      <a href="how-to-use.html">How to Use</a>
-      <a href="important.html">Important</a>
+<body data-dashboard-mode="matches">
+  <aside class="dashboard-sidebar">
+    <a href="/" class="dashboard-brand">MATCHES<span>TOOL</span></a>
+    <nav class="dashboard-nav">
+      <a class="active" href="matches.html">▦ <span>Matches</span></a>
+      <a class="" href="evenodd.html">▦ <span>Even/Odd</span></a>
+      <a class="" href="overunder.html">▦ <span>Over/Under</span></a>
+      <a href="history.html">◷ <span>History</span></a>
+      <a href="how-to-use.html">? <span>How to Use</span></a>
+      <a href="account.html">♙ <span>Account</span></a>
+    </nav>
+    <div class="dashboard-account">
+      <small>ACCOUNT STATUS</small>
+      <strong>Plan: Full Access</strong>
+      <span id="dashboardUser">User: —</span>
+      <button type="button" id="dashboardLogout">Logout</button>
     </div>
+  </aside>
 
-    <div class="nav-actions">
-      <a href="login.html" class="btn small">Login</a>
-      <a href="register.html" class="btn primary small">Get Started</a>
-    </div>
+  <main class="dashboard-main">
+    <header class="dashboard-topbar">
+      <h1>MATCHES PREDICTIONS</h1>
+      <div class="connection-meta">
+        <span id="serverTime">Server Time: --:--:--</span>
+        <span class="connected-dot"></span><span id="connectionSummary">Connecting</span>
+      </div>
+    </header>
 
-  </div>
-</nav>
-
-
-<main class="prediction-page">
-
-  <div class="container prediction-container">
-
-    <div class="page-heading">
-      <span class="page-badge">MATCH DIGIT</span>
-
-      <h1>Predict Match Digit</h1>
-
-      <p>
-        Select a Volatility Index and receive a signal for the next potential
-        matching digit opportunity.
-      </p>
-    </div>
-
-
-    <!-- VOLATILITY SELECTOR -->
-
-    <section class="prediction-card volatility-card">
-
-      <div class="card-heading">
-        <div>
-          <h2>Select Volatility Index</h2>
-          <p>Choose the market you want to analyze.</p>
+    <section class="market-grid" id="marketGrid">
+      <article class="market-card" data-symbol="R_100" data-label="100">
+        <div class="market-name">100</div>
+        <div class="card-status">Connecting…</div>
+        <div class="timer-label">Next prediction in</div>
+        <div class="timer prediction-timer">10<span>sec</span></div>
+        <div class="signal-block">
+          <div class="signal-label">Predicted Digit</div>
+          <div class="signal-value">—</div>
         </div>
-      </div>
-
-      <div class="volatility-grid">
-
-        <button class="volatility-option active" data-volatility="Volatility 10 (1s)">
-          Volatility 10 (1s)
-        </button>
-
-        <button class="volatility-option" data-volatility="Volatility 25 (1s)">
-          Volatility 25 (1s)
-        </button>
-
-        <button class="volatility-option" data-volatility="Volatility 50 (1s)">
-          Volatility 50 (1s)
-        </button>
-
-        <button class="volatility-option" data-volatility="Volatility 75 (1s)">
-          Volatility 75 (1s)
-        </button>
-
-        <button class="volatility-option" data-volatility="Volatility 100 (1s)">
-          Volatility 100 (1s)
-        </button>
-
-      </div>
-
+        <div class="detail-block confluence-block">
+          <div class="detail-label">Trade Confluence</div>
+          <div class="confluence">WAITING</div>
+        </div>
+        <div class="detail-block runs-block">
+          <div class="detail-label">Runs to run</div>
+          <div class="runs">—</div>
+        </div>
+        <div class="entry-area">
+          <div class="entry-label">Enter trade in</div>
+          <div class="timer entry-timer">—</div>
+          <div class="trade-now" hidden>TRADE NOW</div>
+        </div>
+      </article>
+      <article class="market-card" data-symbol="1HZ100V" data-label="100 (1s)">
+        <div class="market-name">100 (1s)</div>
+        <div class="card-status">Connecting…</div>
+        <div class="timer-label">Next prediction in</div>
+        <div class="timer prediction-timer">10<span>sec</span></div>
+        <div class="signal-block">
+          <div class="signal-label">Predicted Digit</div>
+          <div class="signal-value">—</div>
+        </div>
+        <div class="detail-block confluence-block">
+          <div class="detail-label">Trade Confluence</div>
+          <div class="confluence">WAITING</div>
+        </div>
+        <div class="detail-block runs-block">
+          <div class="detail-label">Runs to run</div>
+          <div class="runs">—</div>
+        </div>
+        <div class="entry-area">
+          <div class="entry-label">Enter trade in</div>
+          <div class="timer entry-timer">—</div>
+          <div class="trade-now" hidden>TRADE NOW</div>
+        </div>
+      </article>
+      <article class="market-card" data-symbol="R_75" data-label="75">
+        <div class="market-name">75</div>
+        <div class="card-status">Connecting…</div>
+        <div class="timer-label">Next prediction in</div>
+        <div class="timer prediction-timer">10<span>sec</span></div>
+        <div class="signal-block">
+          <div class="signal-label">Predicted Digit</div>
+          <div class="signal-value">—</div>
+        </div>
+        <div class="detail-block confluence-block">
+          <div class="detail-label">Trade Confluence</div>
+          <div class="confluence">WAITING</div>
+        </div>
+        <div class="detail-block runs-block">
+          <div class="detail-label">Runs to run</div>
+          <div class="runs">—</div>
+        </div>
+        <div class="entry-area">
+          <div class="entry-label">Enter trade in</div>
+          <div class="timer entry-timer">—</div>
+          <div class="trade-now" hidden>TRADE NOW</div>
+        </div>
+      </article>
+      <article class="market-card" data-symbol="1HZ75V" data-label="75 (1s)">
+        <div class="market-name">75 (1s)</div>
+        <div class="card-status">Connecting…</div>
+        <div class="timer-label">Next prediction in</div>
+        <div class="timer prediction-timer">10<span>sec</span></div>
+        <div class="signal-block">
+          <div class="signal-label">Predicted Digit</div>
+          <div class="signal-value">—</div>
+        </div>
+        <div class="detail-block confluence-block">
+          <div class="detail-label">Trade Confluence</div>
+          <div class="confluence">WAITING</div>
+        </div>
+        <div class="detail-block runs-block">
+          <div class="detail-label">Runs to run</div>
+          <div class="runs">—</div>
+        </div>
+        <div class="entry-area">
+          <div class="entry-label">Enter trade in</div>
+          <div class="timer entry-timer">—</div>
+          <div class="trade-now" hidden>TRADE NOW</div>
+        </div>
+      </article>
+      <article class="market-card" data-symbol="R_50" data-label="50">
+        <div class="market-name">50</div>
+        <div class="card-status">Connecting…</div>
+        <div class="timer-label">Next prediction in</div>
+        <div class="timer prediction-timer">10<span>sec</span></div>
+        <div class="signal-block">
+          <div class="signal-label">Predicted Digit</div>
+          <div class="signal-value">—</div>
+        </div>
+        <div class="detail-block confluence-block">
+          <div class="detail-label">Trade Confluence</div>
+          <div class="confluence">WAITING</div>
+        </div>
+        <div class="detail-block runs-block">
+          <div class="detail-label">Runs to run</div>
+          <div class="runs">—</div>
+        </div>
+        <div class="entry-area">
+          <div class="entry-label">Enter trade in</div>
+          <div class="timer entry-timer">—</div>
+          <div class="trade-now" hidden>TRADE NOW</div>
+        </div>
+      </article>
+      <article class="market-card" data-symbol="1HZ50V" data-label="50 (1s)">
+        <div class="market-name">50 (1s)</div>
+        <div class="card-status">Connecting…</div>
+        <div class="timer-label">Next prediction in</div>
+        <div class="timer prediction-timer">10<span>sec</span></div>
+        <div class="signal-block">
+          <div class="signal-label">Predicted Digit</div>
+          <div class="signal-value">—</div>
+        </div>
+        <div class="detail-block confluence-block">
+          <div class="detail-label">Trade Confluence</div>
+          <div class="confluence">WAITING</div>
+        </div>
+        <div class="detail-block runs-block">
+          <div class="detail-label">Runs to run</div>
+          <div class="runs">—</div>
+        </div>
+        <div class="entry-area">
+          <div class="entry-label">Enter trade in</div>
+          <div class="timer entry-timer">—</div>
+          <div class="trade-now" hidden>TRADE NOW</div>
+        </div>
+      </article>
+      <article class="market-card" data-symbol="R_25" data-label="25">
+        <div class="market-name">25</div>
+        <div class="card-status">Connecting…</div>
+        <div class="timer-label">Next prediction in</div>
+        <div class="timer prediction-timer">10<span>sec</span></div>
+        <div class="signal-block">
+          <div class="signal-label">Predicted Digit</div>
+          <div class="signal-value">—</div>
+        </div>
+        <div class="detail-block confluence-block">
+          <div class="detail-label">Trade Confluence</div>
+          <div class="confluence">WAITING</div>
+        </div>
+        <div class="detail-block runs-block">
+          <div class="detail-label">Runs to run</div>
+          <div class="runs">—</div>
+        </div>
+        <div class="entry-area">
+          <div class="entry-label">Enter trade in</div>
+          <div class="timer entry-timer">—</div>
+          <div class="trade-now" hidden>TRADE NOW</div>
+        </div>
+      </article>
+      <article class="market-card" data-symbol="1HZ25V" data-label="25 (1s)">
+        <div class="market-name">25 (1s)</div>
+        <div class="card-status">Connecting…</div>
+        <div class="timer-label">Next prediction in</div>
+        <div class="timer prediction-timer">10<span>sec</span></div>
+        <div class="signal-block">
+          <div class="signal-label">Predicted Digit</div>
+          <div class="signal-value">—</div>
+        </div>
+        <div class="detail-block confluence-block">
+          <div class="detail-label">Trade Confluence</div>
+          <div class="confluence">WAITING</div>
+        </div>
+        <div class="detail-block runs-block">
+          <div class="detail-label">Runs to run</div>
+          <div class="runs">—</div>
+        </div>
+        <div class="entry-area">
+          <div class="entry-label">Enter trade in</div>
+          <div class="timer entry-timer">—</div>
+          <div class="trade-now" hidden>TRADE NOW</div>
+        </div>
+      </article>
+      <article class="market-card" data-symbol="R_10" data-label="10">
+        <div class="market-name">10</div>
+        <div class="card-status">Connecting…</div>
+        <div class="timer-label">Next prediction in</div>
+        <div class="timer prediction-timer">10<span>sec</span></div>
+        <div class="signal-block">
+          <div class="signal-label">Predicted Digit</div>
+          <div class="signal-value">—</div>
+        </div>
+        <div class="detail-block confluence-block">
+          <div class="detail-label">Trade Confluence</div>
+          <div class="confluence">WAITING</div>
+        </div>
+        <div class="detail-block runs-block">
+          <div class="detail-label">Runs to run</div>
+          <div class="runs">—</div>
+        </div>
+        <div class="entry-area">
+          <div class="entry-label">Enter trade in</div>
+          <div class="timer entry-timer">—</div>
+          <div class="trade-now" hidden>TRADE NOW</div>
+        </div>
+      </article>
+      <article class="market-card" data-symbol="1HZ10V" data-label="10 (1s)">
+        <div class="market-name">10 (1s)</div>
+        <div class="card-status">Connecting…</div>
+        <div class="timer-label">Next prediction in</div>
+        <div class="timer prediction-timer">10<span>sec</span></div>
+        <div class="signal-block">
+          <div class="signal-label">Predicted Digit</div>
+          <div class="signal-value">—</div>
+        </div>
+        <div class="detail-block confluence-block">
+          <div class="detail-label">Trade Confluence</div>
+          <div class="confluence">WAITING</div>
+        </div>
+        <div class="detail-block runs-block">
+          <div class="detail-label">Runs to run</div>
+          <div class="runs">—</div>
+        </div>
+        <div class="entry-area">
+          <div class="entry-label">Enter trade in</div>
+          <div class="timer entry-timer">—</div>
+          <div class="trade-now" hidden>TRADE NOW</div>
+        </div>
+      </article>
     </section>
 
+    <footer class="dashboard-footer">
+      This tool provides signals only, not financial advice. Always follow proper risk management.
+    </footer>
+  </main>
 
-    <!-- PREDICTION -->
-
-    <section class="prediction-card main-prediction-card">
-
-      <div class="card-heading">
-        <div>
-          <h2>Prediction</h2>
-          <p>Generate a Match Digit signal.</p>
-        </div>
-      </div>
-
-
-      <div class="prediction-display">
-
-        <div class="prediction-label">
-          PREDICTED MATCH DIGIT
-        </div>
-
-        <div id="matchPrediction" class="prediction-value">
-          --
-        </div>
-
-      </div>
-
-
-      <button id="generateMatchSignal" class="btn primary prediction-button">
-        Generate Signal
-      </button>
-
-    </section>
-
-
-    <!-- TRADE SIGNAL -->
-
-    <section class="prediction-card signal-card">
-
-      <div class="signal-row">
-
-        <div class="signal-info">
-          <span class="signal-label">TRADE SIGNAL</span>
-
-          <strong id="matchTradeSignal">
-            Waiting for signal
-          </strong>
-        </div>
-
-
-        <div class="signal-status">
-
-          <span class="status-dot"></span>
-
-          <span id="matchSignalStatus">
-            Ready
-          </span>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- NEXT SIGNAL TIME -->
-
-    <section class="prediction-card timer-card">
-
-      <div class="timer-content">
-
-        <span class="timer-label">
-          TIME OF NEXT SIGNAL
-        </span>
-
-        <div id="matchSignalTimer" class="timer-value">
-          10
-          <span>SECONDS</span>
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- HOW TO USE -->
-
-    <section class="info-card">
-
-      <h2>How to Use</h2>
-
-      <ol>
-        <li>Select your preferred Volatility Index.</li>
-        <li>Click <strong>Generate Signal</strong>.</li>
-        <li>Wait for the prediction and trade signal.</li>
-        <li>Use the information for analysis only.</li>
-      </ol>
-
-    </section>
-
-
-    <!-- IMPORTANT -->
-
-    <section class="info-card important-card">
-
-      <h2>Important</h2>
-
-      <p>
-        matchestool provides market analysis and signals only.
-        It does not execute trades or guarantee profits.
-        Trading involves risk, and signals should not be treated
-        as financial advice.
-      </p>
-
-    </section>
-
-
-  </div>
-
-</main>
-
-
-<script src="app.js"></script>
-
+  <script src="dashboard.js"></script>
 </body>
 </html>
