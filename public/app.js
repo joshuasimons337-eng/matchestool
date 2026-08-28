@@ -1253,6 +1253,216 @@ async function submitAuth(event) {
 }
 
 
+function updateProfileMenu(user) {
+
+  const loggedOutActions =
+    $('loggedOutActions');
+
+  const profileMenu =
+    $('profileMenu');
+
+  const profileInitials =
+    $('profileInitials');
+
+  const profileEmail =
+    $('profileEmail');
+
+  const profileDropdown =
+    $('profileDropdown');
+
+
+  if (!user) {
+
+    if (loggedOutActions) {
+      loggedOutActions.hidden = false;
+    }
+
+    if (profileMenu) {
+      profileMenu.hidden = true;
+    }
+
+    if (profileDropdown) {
+      profileDropdown.hidden = true;
+    }
+
+    return;
+  }
+
+
+  if (loggedOutActions) {
+    loggedOutActions.hidden = true;
+  }
+
+  if (profileMenu) {
+    profileMenu.hidden = false;
+  }
+
+
+  const email =
+    String(user.email || '');
+
+
+  if (profileEmail) {
+    profileEmail.textContent = email;
+  }
+
+
+  if (profileInitials) {
+
+    const namePart =
+      email.split('@')[0] || 'U';
+
+    const parts =
+      namePart
+        .split(/[.\-_ ]+/)
+        .filter(Boolean);
+
+
+    let initials = '';
+
+    if (parts.length >= 2) {
+
+      initials =
+        parts[0][0] +
+        parts[1][0];
+
+    } else if (parts.length === 1) {
+
+      initials =
+        parts[0].slice(0, 2);
+
+    } else {
+
+      initials = 'U';
+
+    }
+
+
+    profileInitials.textContent =
+      initials.toUpperCase();
+  }
+}
+
+
+function setupProfileMenu() {
+
+  const profileBadge =
+    $('profileBadge');
+
+  const profileDropdown =
+    $('profileDropdown');
+
+  const profileLogout =
+    $('profileLogout');
+
+
+  if (
+    profileBadge &&
+    profileDropdown &&
+    !profileBadge.dataset.profileReady
+  ) {
+
+    profileBadge.dataset.profileReady =
+      'true';
+
+
+    profileBadge.addEventListener(
+      'click',
+      () => {
+
+        profileDropdown.hidden =
+          !profileDropdown.hidden;
+
+      }
+    );
+
+
+    document.addEventListener(
+      'click',
+      event => {
+
+        const profileMenu =
+          $('profileMenu');
+
+
+        if (
+          profileMenu &&
+          !profileMenu.contains(event.target)
+        ) {
+
+          profileDropdown.hidden =
+            true;
+
+        }
+
+      }
+    );
+
+  }
+
+
+  if (
+    profileLogout &&
+    !profileLogout.dataset.profileReady
+  ) {
+
+    profileLogout.dataset.profileReady =
+      'true';
+
+
+    profileLogout.addEventListener(
+      'click',
+      async () => {
+
+        try {
+
+          await fetch(
+            '/api/auth/logout',
+            {
+              method: 'POST',
+
+              headers: csrf
+                ? {
+                    'Content-Type':
+                      'application/json',
+
+                    'X-CSRF-Token':
+                      csrf
+                  }
+                : {
+                    'Content-Type':
+                      'application/json'
+                  },
+
+              body: '{}'
+            }
+          );
+
+        } catch (error) {
+
+          console.error(
+            'Logout failed:',
+            error
+          );
+
+        }
+
+
+        csrf = '';
+
+        updateProfileMenu(null);
+
+
+        window.location.href =
+          'index.html';
+
+      }
+    );
+
+  }
+
+}
+
 async function loadMe() {
 
   try {
@@ -1281,6 +1491,8 @@ async function loadMe() {
       }
 
 
+      updateProfileMenu(null);
+
       return false;
     }
 
@@ -1292,6 +1504,10 @@ async function loadMe() {
     csrf =
       data.csrf || '';
 
+
+    
+
+    updateProfileMenu(data.user);
 
     if ($('accountEmail')) {
 
@@ -3565,6 +3781,9 @@ async function initialize() {
   setAuthMode(
     'login'
   );
+
+
+    setupProfileMenu();
 
 
     loadMe();

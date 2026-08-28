@@ -30,8 +30,46 @@
     </div>
 
     <div class="nav-actions">
-      <a href="login.html" class="btn small">Login</a>
-      <a href="register.html" class="btn primary small">Get Started</a>
+
+      <div id="loggedOutActions">
+        <a href="login.html" class="btn small">Login</a>
+        <a href="register.html" class="btn primary small">Get Started</a>
+      </div>
+
+      <div id="profileMenu" class="profile-menu" hidden>
+
+        <button
+          id="profileBadge"
+          class="profile-badge"
+          type="button"
+          aria-label="Open account menu"
+        >
+          <span id="profileInitials">U</span>
+        </button>
+
+        <div
+          id="profileDropdown"
+          class="profile-dropdown"
+          hidden
+        >
+
+          <div
+            id="profileEmail"
+            class="profile-email"
+          ></div>
+
+          <button
+            id="profileLogout"
+            class="profile-logout"
+            type="button"
+          >
+            Logout
+          </button>
+
+        </div>
+
+      </div>
+
     </div>
 
   </div>

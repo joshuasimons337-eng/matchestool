@@ -1080,3 +1080,104 @@ nav{
   .auth-brand-panel h2{font-size:32px;}
   .auth-card h1{font-size:29px;}
 }
+
+/* =========================
+   PROFILE MENU
+========================= */
+
+#loggedOutActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-menu {
+  position: relative;
+}
+
+.profile-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 140, 255, 0.7);
+  background: #0a0a0a;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.profile-badge:hover {
+  transform: translateY(-1px);
+  border-color: #008cff;
+  background: #111827;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+
+  min-width: 220px;
+
+  padding: 12px;
+
+  border: 1px solid rgba(0, 140, 255, 0.35);
+  border-radius: 12px;
+
+  background: #090909;
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.45);
+
+  z-index: 1000;
+}
+
+.profile-email {
+  padding: 8px 10px 12px;
+
+  color: #d1d5db;
+  font-size: 13px;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.08);
+
+  margin-bottom: 8px;
+
+  overflow-wrap: anywhere;
+}
+
+.profile-logout {
+  width: 100%;
+
+  padding: 10px 12px;
+
+  border: 1px solid rgba(0, 140, 255, 0.35);
+  border-radius: 8px;
+
+  background: transparent;
+  color: #ffffff;
+
+  cursor: pointer;
+
+  font: inherit;
+}
+
+.profile-logout:hover {
+  background: rgba(0, 140, 255, 0.12);
+}
+
+#loggedOutActions[hidden],
+.profile-menu[hidden],
+.profile-dropdown[hidden] {
+  display: none !important;
+}
